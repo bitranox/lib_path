@@ -22,6 +22,17 @@ services:   # start services
 
 matrix:
     include:
+    - os: windows
+      language: sh
+      name: "Windows Python 2.7"
+
+      # oddly a secure password under env: global: causes that choco fails
+      # so we need to put the option : filter_secrets: false
+      # this can be a security issue, check that You dont leak secrets here !
+      filter_secrets: false
+      before_install:
+          - ./lib_bash/lib_retry.sh retry choco install python2
+          - export PATH="/c/Python27:/c/Python27/Scripts:$PATH"
 
     - os: windows
       language: sh
@@ -32,8 +43,16 @@ matrix:
       # this can be a security issue, check that You dont leak secrets here !
       filter_secrets: false
       before_install:
-          - ./lib_bash/lib_retry.sh retry choco install python3
-          - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+        - ./lib_bash/lib_retry.sh retry choco install python3
+        - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+
+    - os: linux
+      language: python
+      python: '2.7'
+
+    - os: linux
+      language: python
+      python: '3.4'
 
     - os: linux
       language: python
@@ -44,9 +63,9 @@ matrix:
       python: '3.6'
       # we can do that also with env - but we dont want to show it on the travis build overview
       before_install:
-          - export mypy_static_typecheck="True"
-          - export build_docs="True"
-          - export deploy_on_pypi="True"
+        - export mypy_static_typecheck="True"
+        - export build_docs="True"
+        - export deploy_on_pypi="True"
 
     - os: linux
       language: python
@@ -58,7 +77,32 @@ matrix:
 
     - os: linux
       language: python
+      python: 'pypy2.7-6.0'
+
+    - os: linux
+      language: python
       python: 'pypy3.5-6.0'
+
+    - os: linux
+      language: python
+      name: "WINE stable 32 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="stable"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE stable 64 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="stable"
+          - wine_python_version="python2"
 
     - os: linux
       language: python
@@ -83,6 +127,27 @@ matrix:
 
     - os: linux
       language: python
+      name: "WINE stable 32 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="stable"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE stable 64 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="stable"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
       name: "WINE stable 32 Bit Python 3.7.3, Windows 10"
       env:
           - WINEARCH="win32"
@@ -101,6 +166,27 @@ matrix:
           - wine_windows_version="win10"
           - wine_version="stable"
           - wine_python_version="python3"
+
+    - os: linux
+      language: python
+      name: "WINE devel 32 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="devel"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE devel 64 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="devel"
+          - wine_python_version="python2"
 
     - os: linux
       language: python
@@ -125,6 +211,27 @@ matrix:
 
     - os: linux
       language: python
+      name: "WINE devel 32 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="devel"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE devel 64 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="devel"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
       name: "WINE devel 32 Bit Python 3.7.3, Windows 10"
       env:
           - WINEARCH="win32"
@@ -143,6 +250,27 @@ matrix:
           - wine_windows_version="win10"
           - wine_version="devel"
           - wine_python_version="python3"
+
+    - os: linux
+      language: python
+      name: "WINE staging 32 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="staging"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE staging 64 Bit Python 2.7.16, Windows XP"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="winxp"
+          - wine_version="staging"
+          - wine_python_version="python2"
 
     - os: linux
       language: python
@@ -167,6 +295,27 @@ matrix:
 
     - os: linux
       language: python
+      name: "WINE staging 32 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEARCH="win32"
+          - WINEPREFIX="${HOME}/wine/wine32"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="staging"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
+      name: "WINE staging 64 Bit Python 2.7.16, Windows 10"
+      env:
+          - WINEPREFIX="${HOME}/wine/wine64"
+          - CMDPREFIX="wine"
+          - wine_windows_version="win10"
+          - wine_version="staging"
+          - wine_python_version="python2"
+
+    - os: linux
+      language: python
       name: "WINE staging 32 Bit Python 3.7.3, Windows 10"
       env:
           - WINEARCH="win32"
@@ -185,6 +334,10 @@ matrix:
           - wine_windows_version="win10"
           - wine_version="staging"
           - wine_python_version="python3"
+
+    - os: osx
+      language: sh
+      name: "osX Python 2.7"
 
     - os: osx
       language: sh
@@ -212,21 +365,16 @@ install:
     - if [[ $TRAVIS_PYTHON_VERSION == pypy3.5-6.0 ]]; then ${CMDPREFIX} ${pip_command} install "pytest-cov==2.6.0"; fi
     # mypy does not run on pypy 3.5 - we only do mypy on python 3.6
     - if [[ "${mypy_static_typecheck}" == "True" ]]; then ${CMDPREFIX} ${pip_command} install mypy; fi
-    # this is the default line for other projects but rst_include itself:
-    # - if [[ "${build_docs}" == "True" ]]; then ${CMDPREFIX} ${pip_command} install rst_include; fi
+    - if [[ "${build_docs}" == "True" ]]; then ${CMDPREFIX} ${pip_command} install rst_include; fi
     - ${CMDPREFIX} ${pip_command} install codecov pytest pytest-pep8 pytest-cov dill
     - if [[ -f setup.py ]]; then export setup_py_found="True" && ./lib_bash/lib_color.sh clr_bold clr_green "setup.py found" ; else ./lib_bash/lib_color.sh clr_bold clr_red  "*** no setup.py found, nothing to test" ; fi
     - if [[ "${setup_py_found}" == "True" ]]; then ${CMDPREFIX} ${pip_command} install -e . ; fi
 
 script:
-    # on rst_include itself we test on every os
-    - export build_docs="True"
-
     - if [[ "${setup_py_found}" == "True" ]]; then ${CMDPREFIX} ${pip_command} install ${github_master} --install-option test ; else ./lib_bash/lib_color.sh clr_bold clr_red  "no setup.py found, nothing to test" ; fi
     - if [[ "${setup_py_found}" == "True" ]]; then ${CMDPREFIX} ${python_command} -m pytest --pep8 --cov ; else ./lib_bash/lib_color.sh clr_bold clr_red  "no setup.py found, nothing to test" ; fi
     - if [[ "${mypy_static_typecheck}" == "True" ]]; then ${CMDPREFIX} ${python_command} -m mypy -p ${REPOSITORY_NAME} && ./lib_bash/lib_color.sh clr_bold clr_green "static typechecking done" ; else ./lib_bash/lib_color.sh clr_bold clr_red "static typechecking disabled on this build" ;  fi
     - if [[ -f build_docs.py ]] && [[ "${build_docs}" == "True" ]]; then ${CMDPREFIX} ${python_command} build_docs.py ${TRAVIS_REPO_SLUG} && ./lib_bash/lib_color.sh clr_bold clr_green "build_docs done" ; else ./lib_bash/lib_color.sh clr_bold clr_red "build_docs disabled on this build" ;  fi
-
 
 after_success:
     - ${CMDPREFIX} coverage report
@@ -248,7 +396,6 @@ after_success:
 deploy:
   provider: pypi
   user: bitranox
-  # password set for
   password:
     secure: ---
   distributions: "sdist bdist_wheel"
@@ -258,7 +405,6 @@ deploy:
     # we need this, because on projects with windows builds only, we can not build on windows, because of
     # the filter_secure issue. So we build on WINE, but need somehow to address the matrix include on which to build
     condition: ${deploy_on_pypi} = "True"
-
 
 notifications:
   email:
