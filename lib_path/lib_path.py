@@ -1,0 +1,428 @@
+import logging
+import os
+from typing import List, Tuple
+
+logger = logging.getLogger()
+
+
+def expand_filelist_subdirectories(l_paths: List[str], expand_subdirs: bool = True, follow_links: bool = True) -> List[str]:
+    """
+    takes a mixed list of directories and files, and returns a list of files expanding the subdirectories
+    >>> # get test directory
+    >>> test_dir1 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/test_a_a'
+    >>> test_dir2 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/test_a_b'
+    >>> test_file1 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
+    >>> l_files = sorted(expand_filelist_subdirectories([test_dir1, test_dir2, test_file1]))
+    >>> assert l_files[0].endswith('/tests/test_a/file_test_a_1.txt')
+    >>> assert l_files[1].endswith('/tests/test_a/test_a_a/.file_test_a_a_1.txt')
+    >>> assert l_files[2].endswith('/tests/test_a/test_a_a/.file_test_a_a_2.txt')
+    >>> assert l_files[3].endswith('/tests/test_a/test_a_a/file_test_a_a_1.txt')
+    >>> assert l_files[4].endswith('/tests/test_a/test_a_a/file_test_a_a_2.txt')
+    >>> assert l_files[5].endswith('/tests/test_a/test_a_b/.file_test_a_b_1.txt')
+    >>> assert l_files[6].endswith('/tests/test_a/test_a_b/.file_test_a_b_2.txt')
+    >>> assert l_files[7].endswith('/tests/test_a/test_a_b/file_test_a_b_1.txt')
+    >>> assert l_files[8].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
+    >>> assert len(l_files) == 9
+
+    """
+
+    l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths)
+    if expand_subdirs:
+        for directory in l_dirs:
+            l_directory_files = get_files_from_directory_recursive(directory, follow_links)
+            l_files = l_files + l_directory_files
+    return l_files
+
+
+def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[List[str], List[str]]:
+    """
+    returns [files], [directories] absolute Paths
+
+    >>> # get test directory
+    >>> test_dir = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a'
+    >>> l_content_of_test_dir = os.listdir(test_dir)
+    >>> # get content of test directory
+    >>> item = ''
+    >>> l_content_of_test_dir_absolute = [ path_join_posix(test_dir, item) for item in l_content_of_test_dir]
+    >>> # test 
+    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_content_of_test_dir_absolute)
+    >>> l_files = sorted(l_files)
+    >>> assert len(l_files) == 6
+    >>> assert l_files[0].endswith('/test_a/.file_test_a_1.txt')
+    >>> assert l_files[1].endswith('/test_a/.file_test_a_2.txt')
+    >>> assert l_files[2].endswith('/test_a/.gitignore')
+    >>> assert l_files[3].endswith('/test_a/.rotekignore')
+    >>> assert l_files[4].endswith('/test_a/file_test_a_1.txt')
+    >>> assert l_files[5].endswith('/test_a/file_test_a_2.txt')
+    >>> l_dirs = sorted(l_dirs)
+    >>> assert len(l_dirs) == 4
+    >>> assert l_dirs[0].endswith('/tests/test_a/.test_a_a')
+    >>> assert l_dirs[1].endswith('/tests/test_a/.test_a_b')
+    >>> assert l_dirs[2].endswith('/tests/test_a/test_a_a')
+    >>> assert l_dirs[3].endswith('/tests/test_a/test_a_b')
+
+    >>> # test not a file or directory 
+    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: path does not exist: something
+
+    """
+
+    l_files = list()
+    l_dirs = list()
+    for path in l_paths:
+        path = strip_and_replace_backslashes(os.path.normpath(path))
+        log_and_raise_if_path_does_not_exist(path)
+        if os.path.isfile(path):
+            l_files.append(path)
+        elif os.path.isdir(path):
+            l_dirs.append(path)
+        else:
+            log_and_raise_if_neither_file_nor_directory(path)
+    return l_files, l_dirs
+
+
+def get_files_from_directory_recursive(directory: str, followlinks: bool = True) -> List[str]:
+    """
+    >>> # get test directory
+    >>> test_dir = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a'
+    >>> l_files = sorted(get_files_from_directory_recursive(test_dir, followlinks=True))
+    >>> assert l_files[0].endswith('/tests/test_a/.file_test_a_1.txt')
+    >>> assert l_files[1].endswith('/tests/test_a/.file_test_a_2.txt')
+    >>> assert l_files[2].endswith('/tests/test_a/.gitignore')
+    >>> assert l_files[3].endswith('/tests/test_a/.rotekignore')
+    >>> assert l_files[4].endswith('/tests/test_a/.test_a_a/.file_test_a_a_1.txt')
+    >>> assert l_files[5].endswith('/tests/test_a/.test_a_a/.file_test_a_a_2.txt')
+    >>> assert l_files[6].endswith('/tests/test_a/.test_a_a/file_test_a_a_1.txt')
+    >>> assert l_files[7].endswith('/tests/test_a/.test_a_a/file_test_a_a_2.txt')
+    >>> assert l_files[8].endswith('/tests/test_a/.test_a_b/.file_test_a_b_1.txt')
+    >>> assert l_files[9].endswith('/tests/test_a/.test_a_b/.file_test_a_b_2.txt')
+    >>> assert l_files[10].endswith('/tests/test_a/.test_a_b/file_test_a_b_1.txt')
+    >>> assert l_files[11].endswith('/tests/test_a/.test_a_b/file_test_a_b_2.txt')
+    >>> assert l_files[12].endswith('/tests/test_a/file_test_a_1.txt')
+    >>> assert l_files[13].endswith('/tests/test_a/file_test_a_2.txt')
+    >>> assert l_files[14].endswith('/tests/test_a/test_a_a/.file_test_a_a_1.txt')
+    >>> assert l_files[15].endswith('/tests/test_a/test_a_a/.file_test_a_a_2.txt')
+    >>> assert l_files[16].endswith('/tests/test_a/test_a_a/file_test_a_a_1.txt')
+    >>> assert l_files[17].endswith('/tests/test_a/test_a_a/file_test_a_a_2.txt')
+    >>> assert l_files[18].endswith('/tests/test_a/test_a_b/.file_test_a_b_1.txt')
+    >>> assert l_files[19].endswith('/tests/test_a/test_a_b/.file_test_a_b_2.txt')
+    >>> assert l_files[20].endswith('/tests/test_a/test_a_b/file_test_a_b_1.txt')
+    >>> assert l_files[21].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
+    >>> assert len(l_files) == 22
+
+    """
+    log_and_raise_if_directory_does_not_exist(directory)
+    l_result_files = list()
+
+    for root, l_dir, l_file in os.walk(directory, followlinks=followlinks):
+        for file in l_file:
+            file = path_join_posix(root, file)
+            log_and_raise_if_file_does_not_exist(file)
+            l_result_files.append(file)
+    return l_result_files
+
+
+def log_and_raise_if_path_does_not_exist(path: str) -> None:
+    """
+    >>> log_and_raise_if_path_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: path does not exist: does_not_exist
+    """
+    if not os.path.exists(path):
+        s_error = 'path does not exist: {path}'.format(path=path)
+        logger.error(s_error)
+        raise FileNotFoundError(s_error)
+
+
+def log_and_raise_if_neither_file_nor_directory(path: str) -> None:
+    """
+    for Dos Devices
+
+    >>> log_and_raise_if_neither_file_nor_directory('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: neither a file nor a directory: does_not_exist
+    """
+
+    if not (os.path.isfile(path) or os.path.isdir(path)):
+        s_error = 'neither a file nor a directory: {path}'.format(path=path)
+        logger.error(s_error)
+        raise FileNotFoundError(s_error)
+
+
+def log_and_raise_if_directory_does_not_exist(directory: str) -> None:
+    """
+    >>> log_and_raise_if_directory_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    NotADirectoryError: not a directory : does_not_exist
+    """
+
+    if not os.path.isdir(directory):
+        s_error = 'not a directory : {directory}'.format(directory=directory)
+        logger.error(s_error)
+        raise NotADirectoryError(s_error)
+
+
+def log_and_raise_if_file_does_not_exist(file: str) -> None:
+    """
+    >>> log_and_raise_if_file_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    FileNotFoundError: file does not exist or no permission: does_not_exist
+    """
+
+    if not os.path.isfile(file):
+        s_error = 'file does not exist or no permission: {file}'.format(file=file)
+        logger.error(s_error)
+        raise FileNotFoundError(s_error)
+
+
+def path_join_posix(path: str, *paths: [str]):
+    """
+    liefert beim joinen einen Pfad jedenfalls als posix pfad retour.
+
+    >>> path_join_posix(r'c:\\test','test')
+    'c:/test/test'
+    >>> path_join_posix('\\\\main','test')
+    '/main/test'
+    >>> path_join_posix('//main','test','test2')
+    '//main/test/test2'
+    >>> path_join_posix('//main','/test/test2','test2')
+    '//main/test/test2/test2'
+    >>> path_join_posix('//main','\\\\test\\\\test2','test2')
+    '//main/test/test2/test2'
+    >>> path_join_posix('//main','\\\\test\\\\test2','test2')
+    '//main/test/test2/test2'
+
+    """
+
+    # sonst geht path_join_posix('//main','/test/test2','test2') schief !
+    ls_paths = []
+    for s_path in paths:
+        s_path = os.path.normpath(s_path)  # brauchen wir wenn es unter Windows läuft - ergibt z.Bsp. '\\\\main\\install'
+        s_path = s_path.replace('\\', '/')
+        s_path = s_path.lstrip('/')
+        ls_paths.append(s_path)
+
+    path = os.path.normpath(path)
+    path = path.replace('\\', '/')
+    ret_path = os.path.join(path, *ls_paths)
+    ret_path = os.path.normpath(ret_path)
+    ret_path = strip_and_replace_backslashes(ret_path)
+    return ret_path
+
+
+def path_remove_trailing_slashes(s_path: str) -> str:
+    """
+    Entfernt "/" am Ende des Pfades
+
+    >>> path_remove_trailing_slashes('//test//')
+    '//test'
+    >>> path_remove_trailing_slashes('//test')
+    '//test'
+
+    """
+    s_path = strip_and_replace_backslashes(s_path)
+    s_path = s_path.rstrip('/')
+    return s_path
+
+
+def get_basename_without_extension(fullpath: str) -> str:
+    """
+    >>> get_basename_without_extension('//main/xyz/test.txt')
+    'test'
+    >>> get_basename_without_extension('//main/xyz/test')
+    'test'
+    >>> get_basename_without_extension('//main/xyz/test.txt.back')
+    'test.txt'
+    """
+    basename = os.path.basename(fullpath)
+    if '.' in basename:
+        basename = basename.rsplit('.', 1)[0]
+    return basename
+
+
+def strip_and_replace_backslashes(path: str) -> str:
+    """
+    >>> strip_and_replace_backslashes('c:\\\\test')
+    'c:/test'
+    >>> strip_and_replace_backslashes('\\\\\\\\main\\\\install')
+    '//main/install'
+    """
+    path = path.strip().replace('\\', '/')
+    return path
+
+
+def is_relative_path(doc_file_name: str) -> bool:
+    """
+    >>> is_relative_path('/test/test.txt')
+    False
+    >>> is_relative_path('//main/install')
+    False
+
+    >>> import platform
+    >>> is_windows = platform.system().lower() == 'windows'
+    >>> result = is_relative_path('c:/test/test.txt')
+    >>> if is_windows:
+    ...    assert result == False
+    ... else:
+    ...    assert result == True
+
+    >>> result = is_relative_path('D:/test/test.txt')
+    >>> if is_windows:
+    ...    assert result == False
+    ... else:
+    ...    assert result == True
+
+    >>> is_relative_path('.test/test.txt')
+    True
+    >>> is_relative_path('test/test.txt')
+    True
+    >>> is_relative_path('./test/test.txt')
+    True
+    >>> is_relative_path('....../test/test.txt')
+    True
+
+    """
+    dirname = strip_and_replace_backslashes(os.path.dirname(doc_file_name))  # windows : /test
+    abspath = strip_and_replace_backslashes(os.path.abspath(dirname))        # windows : C:/test
+    if not path_starts_with_windows_drive_letter(dirname):
+        abspath = substract_windows_drive_letter(abspath)
+    if dirname != abspath:
+        return True
+    else:
+        return False
+
+
+def get_current_dir() -> str:
+    """
+    >>> path = get_current_dir()
+    """
+    current_dir = os.path.abspath(os.curdir)
+    current_dir = strip_and_replace_backslashes(current_dir)
+    return current_dir
+
+
+def is_windows_network_unc(path: str) -> bool:
+    """
+    >>> is_windows_network_unc('/test')
+    False
+    >>> is_windows_network_unc('c:/test')
+    False
+    >>> is_windows_network_unc('//install/main')
+    True
+    """
+    path = strip_and_replace_backslashes(path)
+    if path.startswith('//'):
+        return True
+    else:
+        return False
+
+
+def substract_windows_drive_letter(path: str) -> str:
+    """
+    >>> substract_windows_drive_letter('//main/install')
+    '//main/install'
+    >>> substract_windows_drive_letter('/test')
+    '/test'
+    >>> substract_windows_drive_letter('c:\\\\test')
+    '/test'
+    """
+    path = strip_and_replace_backslashes(path)
+    if path_starts_with_windows_drive_letter(path):
+        path = path[2:]
+    return path
+
+
+def path_starts_with_windows_drive_letter(path: str) -> bool:
+    """
+    >>> path_starts_with_windows_drive_letter('//main/install')
+    False
+    >>> path_starts_with_windows_drive_letter('/test')
+    False
+    >>> path_starts_with_windows_drive_letter('c:\\\\test')
+    True
+    """
+    path = strip_and_replace_backslashes(path)
+    if path[1:].startswith(':/'):
+        return True
+    else:
+        return False
+
+
+def get_absolute_path(path: str) -> str:
+    """
+    >>> get_absolute_path('./test.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../test.py'
+    """
+    path = os.path.abspath(path.strip())
+    path = strip_and_replace_backslashes(path)
+    return path
+
+
+def get_absolute_dirname(path: str) -> str:
+    """
+    >>> get_absolute_dirname('./lib_path.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../lib_path...'
+    """
+    absolute_filename = get_absolute_path(path)
+    absolute_dirname = os.path.dirname(absolute_filename)
+    absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
+    return absolute_dirname
+
+
+def chdir_to_path_of_file(file: str) -> None:
+    """
+    >>> save_dir = get_current_dir()
+    >>> # get test file
+    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
+    >>> chdir_to_path_of_file(test_file)
+    >>> cur_dir = get_current_dir()
+    >>> assert cur_dir.endswith('/lib_path/tests/test_a')
+    >>> os.chdir(save_dir)
+    """
+
+    if file:
+        absolute_dirname = get_absolute_dirname(file)
+        os.chdir(absolute_dirname)
+
+
+def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
+    """
+    if the first path is relative, on windows the drive will be the current drive.
+    this is necessary because WINE gives drive "Z" back !
+
+    >>> # path1 absolut, path2 relativ
+    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', './d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../a/b/c/d/test.txt'
+    >>> # path1 relativ, path2 relativ
+    >>> get_absolute_path_relative_from_path('./a/b/c/some-file.txt', './d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../a/b/c/d/test.txt'
+    >>> # path1 absolut, path2 absolut
+    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', 'c:/d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../d/test.txt'
+    >>> # path1 relativ, path2 absolut
+    >>> get_absolute_path_relative_from_path('./a/b/c/some-file.txt', 'c:/d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../d/test.txt'
+    >>> # path one level back
+    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', '../d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../a/b/d/test.txt'
+    >>> # path two levels back
+    >>> get_absolute_path_relative_from_path('./a/b/c/some_file.txt', '../../d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../a/d/test.txt'
+    >>> result = get_absolute_path_relative_from_path('./a/b/c/some_file.txt', '/f/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> result = substract_windows_drive_letter(result)
+    >>> assert result.lower() == '/f/test.txt'
+
+    """
+
+    if is_relative_path(path2):
+        base_path = os.path.abspath(os.path.dirname(path))
+        result_path = get_absolute_path(base_path + '/' + path2)
+    else:
+        result_path = get_absolute_path(path2)
+    return result_path
