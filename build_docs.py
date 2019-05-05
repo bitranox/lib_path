@@ -16,7 +16,7 @@ import subprocess
 
 
 # CONSTANTS & PROJECT SPECIFIC FUNCTIONS
-codeclimate_link_hash = "ff3f414903627e5cfc35"
+codeclimate_link_hash = "eafdc923e24d12513284"
 
 
 def project_specific(repository_slug, repository, repository_dashed):

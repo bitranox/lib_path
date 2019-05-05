@@ -21,7 +21,7 @@ lib_path
    :target: https://snyk.io/test/github/bitranox/lib_path
 .. |jupyter| image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/bitranox/lib_path/master?filepath=jupyter_test_lib_path.ipynb
-.. |code climate| image:: https://api.codeclimate.com/v1/badges/ff3f414903627e5cfc35/maintainability
+.. |code climate| image:: https://api.codeclimate.com/v1/badges/eafdc923e24d12513284/maintainability
    :target: https://codeclimate.com/github/bitranox/lib_path/maintainability
    :alt: Maintainability
 
