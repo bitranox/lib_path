@@ -44,7 +44,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     >>> # get content of test directory
     >>> item = ''
     >>> l_content_of_test_dir_absolute = [ path_join_posix(test_dir, item) for item in l_content_of_test_dir]
-    >>> # test 
+    >>> # test
     >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_content_of_test_dir_absolute)
     >>> l_files = sorted(l_files)
     >>> assert len(l_files) == 6
@@ -61,7 +61,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     >>> assert l_dirs[2].endswith('/tests/test_a/test_a_a')
     >>> assert l_dirs[3].endswith('/tests/test_a/test_a_b')
 
-    >>> # test not a file or directory 
+    >>> # test not a file or directory
     >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
