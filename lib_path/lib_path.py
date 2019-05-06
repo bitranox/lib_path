@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 logger = logging.getLogger()
 
@@ -31,6 +31,7 @@ def expand_filelist_subdirectories(l_paths: List[str], expand_subdirs: bool = Tr
         for directory in l_dirs:
             l_directory_files = get_files_from_directory_recursive(directory, follow_links)
             l_files = l_files + l_directory_files
+    l_files = list(set(l_files))    # deduplicate
     return l_files
 
 
@@ -76,10 +77,8 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
         log_and_raise_if_path_does_not_exist(path)
         if os.path.isfile(path):
             l_files.append(path)
-        elif os.path.isdir(path):
-            l_dirs.append(path)
         else:
-            log_and_raise_if_neither_file_nor_directory(path)
+            l_dirs.append(path)
     return l_files, l_dirs
 
 
@@ -181,16 +180,17 @@ def log_and_raise_if_file_does_not_exist(file: str) -> None:
         raise FileNotFoundError(s_error)
 
 
-def path_join_posix(path: str, *paths: [str]):
+def path_join_posix(path: str, *paths: str):
     """
     liefert beim joinen einen Pfad jedenfalls als posix pfad retour.
+
+    >>> path_join_posix('//main','test','test2')
+    '//main/test/test2'
 
     >>> path_join_posix(r'c:\\test','test')
     'c:/test/test'
     >>> path_join_posix('\\\\main','test')
     '/main/test'
-    >>> path_join_posix('//main','test','test2')
-    '//main/test/test2'
     >>> path_join_posix('//main','/test/test2','test2')
     '//main/test/test2/test2'
     >>> path_join_posix('//main','\\\\test\\\\test2','test2')
@@ -208,11 +208,14 @@ def path_join_posix(path: str, *paths: [str]):
         s_path = s_path.lstrip('/')
         ls_paths.append(s_path)
 
+    is_windows_unc = is_windows_network_unc(path)
     path = os.path.normpath(path)
-    path = path.replace('\\', '/')
+    path = strip_and_replace_backslashes(path)
     ret_path = os.path.join(path, *ls_paths)
     ret_path = os.path.normpath(ret_path)
     ret_path = strip_and_replace_backslashes(ret_path)
+    if is_windows_unc:
+        ret_path = '//' + ret_path.lstrip('/')
     return ret_path
 
 
