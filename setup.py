@@ -50,7 +50,8 @@ setup(
     url='https://github.com/bitranox/lib_path',
     packages=['lib_path'],
     install_requires=['pytest',
-                      'typing'],
+                      'typing',
+                      'lib_platform'],
     classifiers=CLASSIFIERS,
     setup_requires=['pytest-runner'],
     tests_require=['pytest'])

@@ -1,3 +1,4 @@
+import lib_platform
 import logging
 import os
 from typing import List, Tuple, Any
@@ -110,7 +111,6 @@ def get_files_from_directory_recursive(directory: str, followlinks: bool = True)
     >>> assert l_files[20].endswith('/tests/test_a/test_a_b/file_test_a_b_1.txt')
     >>> assert l_files[21].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
     >>> assert len(l_files) == 22
-
     """
     log_and_raise_if_directory_does_not_exist(directory)
     l_result_files = list()
@@ -119,6 +119,7 @@ def get_files_from_directory_recursive(directory: str, followlinks: bool = True)
         for file in l_file:
             path = path_join_posix(root, file)
             log_and_raise_if_file_does_not_exist(path)
+            path = format_abs_norm_path(path)
             l_result_files.append(path)
     return l_result_files
 
@@ -289,6 +290,8 @@ def is_relative_path(doc_file_name: str) -> bool:
     True
     >>> is_relative_path('....../test/test.txt')
     True
+    >>> is_relative_path('../../../test/test.txt')
+    True
 
     """
     dirname = strip_and_replace_backslashes(os.path.dirname(doc_file_name))  # windows : /test
@@ -306,7 +309,7 @@ def get_current_dir() -> str:
     >>> path = get_current_dir()
     """
     current_dir = os.path.abspath(os.curdir)
-    current_dir = strip_and_replace_backslashes(current_dir)
+    current_dir = format_abs_norm_path(current_dir)
     return current_dir
 
 
@@ -362,17 +365,18 @@ def get_absolute_path(path: str) -> str:
     >>> get_absolute_path('./test.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     '.../test.py'
     """
-    path = os.path.abspath(path.strip())
-    path = strip_and_replace_backslashes(path)
+    path = format_abs_norm_path(path)
     return path
 
 
 def get_absolute_dirname(path: str) -> str:
     """
+    >>> get_absolute_dirname('//main/test/../test2/lib_path.py')
+    '//main/test2/'
     >>> get_absolute_dirname('./lib_path.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     '.../lib_path...'
     """
-    absolute_filename = get_absolute_path(path)
+    absolute_filename = format_abs_norm_path(path)
     absolute_dirname = os.path.dirname(absolute_filename)
     absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
     return absolute_dirname
@@ -439,9 +443,20 @@ def format_abs_norm_path(path: str) -> str:
     >>> assert result.endswith('/tests/test_a/file_test_a_1.txt')
     >>> format_abs_norm_path('//main/test')
     '//main/test'
+    >>> format_abs_norm_path('//main/test/../test2')
+    '//main/test2'
+    >>> format_abs_norm_path('main/test/../test2')     # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    '.../lib_path/main/test2'
 
     """
+    path = strip_and_replace_backslashes(path)
+
+    if lib_platform.is_platform_windows and is_windows_network_unc(path):
+        path = '/' + path.lstrip('/')
+        path = os.path.normpath(path)
+        path = '/' + substract_windows_drive_letter(path)
+    else:
+        path = os.path.normpath(path)
     path = os.path.abspath(path)
-    path = os.path.normpath(path)
     path = strip_and_replace_backslashes(path)
     return path
