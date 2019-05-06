@@ -185,13 +185,12 @@ def path_join_posix(path: str, *paths: str):
     """
     liefert beim joinen einen Pfad jedenfalls als posix pfad retour.
 
+    >>> path_join_posix(r'\\\\main','test')
+    '//main/test'
     >>> path_join_posix('//main','test','test2')
     '//main/test/test2'
-
     >>> path_join_posix(r'c:\\test','test')
     'c:/test/test'
-    >>> path_join_posix('\\\\main','test')
-    '/main/test'
     >>> path_join_posix('//main','/test/test2','test2')
     '//main/test/test2/test2'
     >>> path_join_posix('//main','\\\\test\\\\test2','test2')
@@ -204,19 +203,13 @@ def path_join_posix(path: str, *paths: str):
     # sonst geht path_join_posix('//main','/test/test2','test2') schief !
     ls_paths = []
     for s_path in paths:
-        s_path = os.path.normpath(s_path)  # brauchen wir wenn es unter Windows läuft - ergibt z.Bsp. '\\\\main\\install'
         s_path = s_path.replace('\\', '/')
         s_path = s_path.lstrip('/')
         ls_paths.append(s_path)
 
-    is_windows_unc = is_windows_network_unc(path)
-    path = os.path.normpath(path)
-    path = strip_and_replace_backslashes(path)
+    path = format_abs_norm_path(path)
     ret_path = os.path.join(path, *ls_paths)
-    ret_path = os.path.normpath(ret_path)
-    ret_path = strip_and_replace_backslashes(ret_path)
-    if is_windows_unc:
-        ret_path = '//' + ret_path.lstrip('/')
+    ret_path = format_abs_norm_path(ret_path)
     return ret_path
 
 
@@ -308,8 +301,7 @@ def get_current_dir() -> str:
     """
     >>> path = get_current_dir()
     """
-    current_dir = os.path.abspath(os.curdir)
-    current_dir = format_abs_norm_path(current_dir)
+    current_dir = format_abs_norm_path(os.curdir)
     return current_dir
 
 
@@ -428,15 +420,17 @@ def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
     """
 
     if is_relative_path(path2):
-        base_path = os.path.abspath(os.path.dirname(path))
-        result_path = get_absolute_path(base_path + '/' + path2)
+        base_path = get_absolute_dirname(path)
+        result_path = format_abs_norm_path(base_path + '/' + path2)
     else:
-        result_path = get_absolute_path(path2)
+        result_path = format_abs_norm_path(path2)
     return result_path
 
 
 def format_abs_norm_path(path: str) -> str:
     """
+    >>> format_abs_norm_path(r'\\\\main')
+    '//main'
     >>> # get test file
     >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
     >>> result = format_abs_norm_path(test_file)
@@ -447,6 +441,8 @@ def format_abs_norm_path(path: str) -> str:
     '//main/test2'
     >>> format_abs_norm_path('main/test/../test2')     # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     '.../lib_path/main/test2'
+    >>> format_abs_norm_path('//main')
+    '//main'
 
     """
     path = strip_and_replace_backslashes(path)
@@ -454,9 +450,10 @@ def format_abs_norm_path(path: str) -> str:
     if lib_platform.is_platform_windows and is_windows_network_unc(path):
         path = '/' + path.lstrip('/')
         path = os.path.normpath(path)
+        path = os.path.abspath(path)
         path = '/' + substract_windows_drive_letter(path)
     else:
         path = os.path.normpath(path)
-    path = os.path.abspath(path)
+        path = os.path.abspath(path)
     path = strip_and_replace_backslashes(path)
     return path
