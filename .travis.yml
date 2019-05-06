@@ -248,7 +248,7 @@ deploy:
   provider: pypi
   user: bitranox
   password:
-    secure: ---
+    secure: ChmLedxuX0PsRHuDK4AhzmyeqlOo8PsA4bDP4YtknZ7296ZPuFRD6XpicJcLX+Wek3BsQnXmGhkTO2UqTyDKnICt91rQSigc2Qs2wOIF45FCcdLZvo72Nf7+fz7v8k1xx2YD9Ri4sTzDDtN5gV2Xn5+5jLGU2fGswPWFGudQuV4wZdjkQ3Ui8QnXSSBGbZtnClcDH9BTed+7RT+4fq+whDhxHlPoaqifSGq/2PfdDCMGNlTCiKoq2OTssI7wP/el69zM3KjiWUU/jz/cVEH2eFD4rtceGysPnJeeHTXxUHbTJy5HLE6b6/pw0qm1BZXy+OZIPwKYmPbWctBbU1IG2lPat8zllm4vd+r1Q3y7iNXVeTFCJAjAfoch+pygEwXT3vf9+5xpFKuo20jIK7QBdbDC4QY+If0ePVFDsg9OFg2kPI9WpDF2uOU0ihBrkZ6k3Gz+mVqt+B3HH8bJUn9D3/fT+INKPUepQaMVAelmTa12Y17zWurdr1Xtx4qca0xXvuFruhCFZQUpVixzJopS3hwIdS9riZr3OPoYeRwQGuSEbWkj9JhSkPWvxxKHGojxzDeaZ/CQguuCoS8cxMRbQwzclFnx/rTNcijlBhjuirgl8YiuXGo44EWOwe7u033WhIi69R1ImU79tPf+ujVMrmFNF7NV/PvalwBcEZQUxmY=
   distributions: "sdist bdist_wheel"
   on:
     tags: true    # we release only on PyPi on tagged Releases (Release on Github)
