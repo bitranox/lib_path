@@ -376,6 +376,7 @@ def get_absolute_dirname(path: str) -> str:
     absolute_filename = format_abs_norm_path(path)
     absolute_dirname = os.path.dirname(absolute_filename)
     absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
+    absolute_dirname = absolute_dirname.rstrip('/')
     return absolute_dirname
 
 
