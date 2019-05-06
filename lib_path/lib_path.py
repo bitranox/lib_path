@@ -370,7 +370,6 @@ def get_absolute_dirname(path: str) -> str:
 def chdir_to_path_of_file(path: str) -> None:
     """
     >>> save_dir = get_current_dir()
-    >>> path
     >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
     >>> chdir_to_path_of_file(test_file)
     >>> cur_dir = get_current_dir()
