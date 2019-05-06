@@ -207,9 +207,14 @@ def path_join_posix(path: str, *paths: str):
         s_path = s_path.lstrip('/')
         ls_paths.append(s_path)
 
-    path = format_abs_norm_path(path)
+    is_windows_unc = is_windows_network_unc(path)
+    path = os.path.normpath(path)
+    path = strip_and_replace_backslashes(path)
     ret_path = os.path.join(path, *ls_paths)
-    ret_path = format_abs_norm_path(ret_path)
+    ret_path = os.path.normpath(ret_path)
+    ret_path = strip_and_replace_backslashes(ret_path)
+    if is_windows_unc:
+        ret_path = '//' + ret_path.lstrip('/')
     return ret_path
 
 
