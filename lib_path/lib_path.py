@@ -364,7 +364,7 @@ def get_absolute_path(path: str) -> str:
 def get_absolute_dirname(path: str) -> str:
     """
     >>> get_absolute_dirname('//main/test/../test2/lib_path.py')
-    '//main/test2/'
+    '//main/test2'
     >>> get_absolute_dirname('./lib_path.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     '.../lib_path...'
     """
