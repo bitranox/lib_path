@@ -1,7 +1,7 @@
 lib_path
 ========
 
-|Pypi Status| |license| |maintenance| |jupyter|
+|Pypi Status| |pyversion| |license| |maintenance|
 
 |Build Status| |Codecov Status| |Better Code| |code climate| |snyk security|
 
@@ -19,13 +19,14 @@ lib_path
    :target: https://bettercodehub.com/results/bitranox/lib_path
 .. |snyk security| image:: https://snyk.io/test/github/bitranox/lib_path/badge.svg
    :target: https://snyk.io/test/github/bitranox/lib_path
-.. |jupyter| image:: https://mybinder.org/badge.svg
-   :target: https://mybinder.org/v2/gh/bitranox/lib_path/master?filepath=jupyter_test_lib_path.ipynb
 .. |code climate| image:: https://api.codeclimate.com/v1/badges/eafdc923e24d12513284/maintainability
    :target: https://codeclimate.com/github/bitranox/lib_path/maintainability
    :alt: Maintainability
+.. |pyversion| image:: https://img.shields.io/badge/python-%3E%3D3.5-brightgreen.svg
+   :target: https://badge.fury.io/py/lib_path
+   :alt: Python Version
 
-path related functions
+path related functions - that also work correctly with windows UNC Paths like //server/share/directory/../../directory2
 
 `100% code coverage <https://codecov.io/gh/bitranox/lib_path>`_, mypy static type checking, tested under `Linux, OsX, Windows and Wine <https://travis-ci.org/bitranox/lib_path>`_, automatic daily builds  and monitoring
 
@@ -108,6 +109,47 @@ via python:
 Basic Usage
 -----------
 
+.. code-block:: py
+
+    chdir_to_path_of_file(path: str) -> None
+
+    expand_filelist_subdirectories(l_paths: List[str], expand_subdirs: bool = True, follow_links: bool = True) -> List[str]
+
+    format_abs_norm_path(path: str) -> str
+
+    get_absolute_dirname(path: str) -> str
+
+    get_absolute_path(path: str) -> str
+
+    get_absolute_path_relative_from_path(path: str, path2: str) -> str
+
+    get_basename_without_extension(path: str) -> str
+
+    get_current_dir() -> str
+
+    get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[List[str], List[str]]
+
+    get_files_from_directory_recursive(directory: str, followlinks: bool = True) -> List[str]
+
+    is_relative_path(path: str) -> bool
+
+    is_windows_network_unc(path: str) -> bool
+
+    log_and_raise_if_directory_does_not_exist(directory: str) -> None
+
+    log_and_raise_if_file_does_not_exist(file: str) -> None
+
+    log_and_raise_if_path_does_not_exist(path: str) -> None
+
+    path_join_posix(path: str, *paths: str)
+
+    path_remove_trailing_slashes(path: str) -> str
+
+    path_starts_with_windows_drive_letter(path: str) -> bool
+
+    strip_and_replace_backslashes(path: str) -> str
+
+    substract_windows_drive_letter(path: str) -> str
 
 Requirements
 ------------
@@ -118,6 +160,7 @@ following modules will be automatically installed :
 
     pytest  # see : https://github.com/pytest-dev/pytest
     typing  # see : https://pypi.org/project/typing/
+    lib_platform
 
 Acknowledgements
 ----------------

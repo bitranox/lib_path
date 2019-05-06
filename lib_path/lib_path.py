@@ -73,12 +73,15 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
 
     l_files = list()
     l_dirs = list()
+
     for path in l_paths:
+        path = strip_and_replace_backslashes(path)
         path = format_abs_norm_path(path)
         log_and_raise_if_path_does_not_exist(path)
         if os.path.isfile(path):
             l_files.append(path)
         else:
+            path = path_remove_trailing_slashes(path)
             l_dirs.append(path)
     return l_files, l_dirs
 
@@ -133,22 +136,6 @@ def log_and_raise_if_path_does_not_exist(path: str) -> None:
     """
     if not os.path.exists(path):
         s_error = 'path does not exist: {path}'.format(path=path)
-        logger.error(s_error)
-        raise FileNotFoundError(s_error)
-
-
-def log_and_raise_if_neither_file_nor_directory(path: str) -> None:
-    """
-    for Dos Devices
-
-    >>> log_and_raise_if_neither_file_nor_directory('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    Traceback (most recent call last):
-    ...
-    FileNotFoundError: neither a file nor a directory: does_not_exist
-    """
-
-    if not (os.path.isfile(path) or os.path.isdir(path)):
-        s_error = 'neither a file nor a directory: {path}'.format(path=path)
         logger.error(s_error)
         raise FileNotFoundError(s_error)
 
@@ -218,7 +205,7 @@ def path_join_posix(path: str, *paths: str):
     return ret_path
 
 
-def path_remove_trailing_slashes(s_path: str) -> str:
+def path_remove_trailing_slashes(path: str) -> str:
     """
     Entfernt "/" am Ende des Pfades
 
@@ -228,12 +215,12 @@ def path_remove_trailing_slashes(s_path: str) -> str:
     '//test'
 
     """
-    s_path = strip_and_replace_backslashes(s_path)
-    s_path = s_path.rstrip('/')
-    return s_path
+    path = strip_and_replace_backslashes(path)
+    path = path.rstrip('/')
+    return path
 
 
-def get_basename_without_extension(fullpath: str) -> str:
+def get_basename_without_extension(path: str) -> str:
     """
     >>> get_basename_without_extension('//main/xyz/test.txt')
     'test'
@@ -242,7 +229,7 @@ def get_basename_without_extension(fullpath: str) -> str:
     >>> get_basename_without_extension('//main/xyz/test.txt.back')
     'test.txt'
     """
-    basename = os.path.basename(fullpath)
+    basename = os.path.basename(path)
     if '.' in basename:
         basename = basename.rsplit('.', 1)[0]
     return basename
@@ -259,7 +246,7 @@ def strip_and_replace_backslashes(path: str) -> str:
     return path
 
 
-def is_relative_path(doc_file_name: str) -> bool:
+def is_relative_path(path: str) -> bool:
     """
     >>> is_relative_path('/test/test.txt')
     False
@@ -292,7 +279,7 @@ def is_relative_path(doc_file_name: str) -> bool:
     True
 
     """
-    dirname = strip_and_replace_backslashes(os.path.dirname(doc_file_name))  # windows : /test
+    dirname = strip_and_replace_backslashes(os.path.dirname(path))  # windows : /test
     abspath = strip_and_replace_backslashes(os.path.abspath(dirname))        # windows : C:/test
     if not path_starts_with_windows_drive_letter(dirname):
         abspath = substract_windows_drive_letter(abspath)
@@ -376,14 +363,14 @@ def get_absolute_dirname(path: str) -> str:
     absolute_filename = format_abs_norm_path(path)
     absolute_dirname = os.path.dirname(absolute_filename)
     absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
-    absolute_dirname = absolute_dirname.rstrip('/')
+    absolute_dirname = path_remove_trailing_slashes(absolute_dirname)
     return absolute_dirname
 
 
-def chdir_to_path_of_file(file: str) -> None:
+def chdir_to_path_of_file(path: str) -> None:
     """
     >>> save_dir = get_current_dir()
-    >>> # get test file
+    >>> path
     >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
     >>> chdir_to_path_of_file(test_file)
     >>> cur_dir = get_current_dir()
@@ -391,8 +378,8 @@ def chdir_to_path_of_file(file: str) -> None:
     >>> os.chdir(save_dir)
     """
 
-    if file:
-        absolute_dirname = get_absolute_dirname(file)
+    if path:
+        absolute_dirname = get_absolute_dirname(path)
         os.chdir(absolute_dirname)
 
 

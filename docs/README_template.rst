@@ -1,9 +1,9 @@
 lib_path
 ========
 
-.. include:: ./badges_with_jupyter.rst
+.. include:: ./badges_without_jupyter.rst
 
-path related functions
+path related functions - that also work correctly with windows UNC Paths like //server/share/directory/../../directory2
 
 .. include:: ./tested_under.rst
 
@@ -27,7 +27,6 @@ Try it Online
 .. include:: ./try_in_jupyter.rst
 
 
-
 Installation and Upgrade
 ------------------------
 .. include:: ./installation.rst
@@ -35,7 +34,7 @@ Installation and Upgrade
 
 Basic Usage
 -----------
-
+.. include:: ./basic_usage.rst
 
 Requirements
 ------------
