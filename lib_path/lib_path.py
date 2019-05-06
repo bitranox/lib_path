@@ -67,7 +67,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
-    FileNotFoundError: path does not exist: something
+    FileNotFoundError: path does not exist: ...something
 
     """
 
