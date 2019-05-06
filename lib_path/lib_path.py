@@ -73,7 +73,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     l_files = list()
     l_dirs = list()
     for path in l_paths:
-        path = strip_and_replace_backslashes(os.path.normpath(path))
+        path = format_abs_norm_path(path)
         log_and_raise_if_path_does_not_exist(path)
         if os.path.isfile(path):
             l_files.append(path)
@@ -117,9 +117,9 @@ def get_files_from_directory_recursive(directory: str, followlinks: bool = True)
 
     for root, l_dir, l_file in os.walk(directory, followlinks=followlinks):
         for file in l_file:
-            file = path_join_posix(root, file)
-            log_and_raise_if_file_does_not_exist(file)
-            l_result_files.append(file)
+            path = path_join_posix(root, file)
+            log_and_raise_if_file_does_not_exist(path)
+            l_result_files.append(path)
     return l_result_files
 
 
@@ -429,3 +429,19 @@ def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
     else:
         result_path = get_absolute_path(path2)
     return result_path
+
+
+def format_abs_norm_path(path: str) -> str:
+    """
+    >>> # get test file
+    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
+    >>> result = format_abs_norm_path(test_file)
+    >>> assert result.endswith('/tests/test_a/file_test_a_1.txt')
+    >>> format_abs_norm_path('//main/test')
+    '//main/test'
+
+    """
+    path = os.path.abspath(path)
+    path = os.path.normpath(path)
+    path = strip_and_replace_backslashes(path)
+    return path
