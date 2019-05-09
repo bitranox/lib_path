@@ -1,4 +1,4 @@
-.. code-block:: py
+.. code-block:: sh
 
     chdir_to_path_of_file(path: str) -> None
 

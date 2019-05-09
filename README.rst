@@ -109,7 +109,7 @@ via python:
 Basic Usage
 -----------
 
-.. code-block:: py
+.. code-block:: sh
 
     chdir_to_path_of_file(path: str) -> None
 
@@ -158,9 +158,9 @@ following modules will be automatically installed :
 
 .. code-block:: shell
 
-    pytest  # see : https://github.com/pytest-dev/pytest
-    typing  # see : https://pypi.org/project/typing/
-    lib_platform
+    lib_platform    # see : https://github.com/bitranox/lib_platform
+    pytest          # see : https://github.com/pytest-dev/pytest
+    typing          # see : https://pypi.org/project/typing/
 
 Acknowledgements
 ----------------
