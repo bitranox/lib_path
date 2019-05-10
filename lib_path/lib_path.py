@@ -154,6 +154,23 @@ def log_and_raise_if_directory_does_not_exist(directory: str) -> None:
         raise NotADirectoryError(s_error)
 
 
+def log_and_raise_if_target_directory_within_source_directory(source_directory: str, target_directory: str) -> None:
+    """
+    >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test/test2')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    FileExistsError: target directory: "/test/test2/" is within the source directory "/test/"
+
+    >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test2')
+    """
+    source_directory = format_abs_norm_path(source_directory) + '/'
+    target_directory = format_abs_norm_path(target_directory) + '/'
+    if target_directory.startswith(source_directory):
+        s_error = 'target directory: "{}" is within the source directory "{}"'.format(target_directory, source_directory)
+        logger.error(s_error)
+        raise FileExistsError(s_error)
+
+
 def log_and_raise_if_file_does_not_exist(file: str) -> None:
     """
     >>> log_and_raise_if_file_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
@@ -435,6 +452,16 @@ def format_abs_norm_path(path: str) -> str:
     '.../lib_path/main/test2'
     >>> format_abs_norm_path('//main')
     '//main'
+    >>> format_norm_path('c:/test/../test2/test.txt')
+    'c:/test2/test.txt'
+
+    """
+
+    path = format_norm_path(path)
+    path = os.path.abspath(path)
+    path = strip_and_replace_backslashes(path)
+    return path
+
 
     """
     path = strip_and_replace_backslashes(path)
@@ -447,5 +474,38 @@ def format_abs_norm_path(path: str) -> str:
     else:
         path = os.path.normpath(path)
         path = os.path.abspath(path)
+    path = strip_and_replace_backslashes(path)
+    return path
+    """
+
+
+def format_norm_path(path: str) -> str:
+    """
+    >>> format_norm_path(r'\\\\main')
+    '//main'
+    >>> # get test file
+    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
+    >>> result = format_abs_norm_path(test_file)
+    >>> assert result.endswith('/tests/test_a/file_test_a_1.txt')
+    >>> format_norm_path('//main/test')
+    '//main/test'
+    >>> format_norm_path('//main/test/../test2')
+    '//main/test2'
+    >>> format_norm_path('main/test/../test2')
+    'main/test2'
+    >>> format_norm_path('//main')
+    '//main'
+    >>> format_norm_path('c:/test/../test2/test.txt')
+    'c:/test2/test.txt'
+
+    """
+    path = strip_and_replace_backslashes(path)
+
+    if lib_platform.is_platform_windows and is_windows_network_unc(path):
+        path = '/' + path.lstrip('/')
+        path = os.path.normpath(path)
+        path = '/' + substract_windows_drive_letter(path)
+    else:
+        path = os.path.normpath(path)
     path = strip_and_replace_backslashes(path)
     return path
