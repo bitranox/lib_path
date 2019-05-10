@@ -159,7 +159,7 @@ def log_and_raise_if_target_directory_within_source_directory(source_directory: 
     >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test/test2')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
-    FileExistsError: target directory: "/test/test2/" is within the source directory "/test/"
+    FileExistsError: target directory: "/test/test2" is within the source directory "/test"
 
     >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test2')
     """
