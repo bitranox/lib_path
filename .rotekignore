@@ -109,7 +109,6 @@ docs/
 lib_bash/
 !*.py
 
-
 build_docs.py
 conftest.py
 
