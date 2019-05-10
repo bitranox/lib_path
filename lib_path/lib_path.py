@@ -163,8 +163,8 @@ def log_and_raise_if_target_directory_within_source_directory(source_directory: 
 
     >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test2')
     """
-    source_directory = format_abs_norm_path(source_directory) + '/'
-    target_directory = format_abs_norm_path(target_directory) + '/'
+    source_directory = format_norm_path(source_directory) + '/'
+    target_directory = format_norm_path(target_directory) + '/'
     if target_directory.startswith(source_directory):
         s_error = 'target directory: "{}" is within the source directory "{}"'.format(target_directory, source_directory)
         logger.error(s_error)
