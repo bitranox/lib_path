@@ -115,13 +115,13 @@ def get_files_from_directory_recursive(directory: str, followlinks: bool = True)
     >>> assert l_files[21].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
     >>> assert len(l_files) == 22
     """
-    log_and_raise_if_directory_does_not_exist(directory)
+    log_and_raise_if_not_isdir(directory)
     l_result_files = list()
 
     for root, l_dir, l_file in os.walk(directory, followlinks=followlinks):
         for file in l_file:
             path = path_join_posix(root, file)
-            log_and_raise_if_file_does_not_exist(path)
+            log_and_raise_if_not_isfile(path)
             path = format_abs_norm_path(path)
             l_result_files.append(path)
     return l_result_files
@@ -140,9 +140,9 @@ def log_and_raise_if_path_does_not_exist(path: str) -> None:
         raise FileNotFoundError(s_error)
 
 
-def log_and_raise_if_directory_does_not_exist(directory: str) -> None:
+def log_and_raise_if_not_isdir(directory: str) -> None:
     """
-    >>> log_and_raise_if_directory_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_not_isdir('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     NotADirectoryError: not a directory : does_not_exist
@@ -163,17 +163,24 @@ def log_and_raise_if_target_directory_within_source_directory(source_directory: 
 
     >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test2')
     """
-    source_directory = format_norm_path(source_directory) + '/'
-    target_directory = format_norm_path(target_directory) + '/'
-    if target_directory.startswith(source_directory):
+    if is_target_directory_within_source_directory(source_directory, target_directory):
         s_error = 'target directory: "{}" is within the source directory "{}"'.format(target_directory, source_directory)
         logger.error(s_error)
         raise FileExistsError(s_error)
 
 
-def log_and_raise_if_file_does_not_exist(file: str) -> None:
+def is_target_directory_within_source_directory(source_directory: str, target_directory: str) -> bool:
+    source_directory = format_abs_norm_path(source_directory) + '/'
+    target_directory = format_abs_norm_path(target_directory) + '/'
+    if target_directory.startswith(source_directory):
+        return True
+    else:
+        return False
+
+
+def log_and_raise_if_not_isfile(file: str) -> None:
     """
-    >>> log_and_raise_if_file_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_not_isfile('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     FileNotFoundError: file does not exist or no permission: does_not_exist
@@ -185,7 +192,7 @@ def log_and_raise_if_file_does_not_exist(file: str) -> None:
         raise FileNotFoundError(s_error)
 
 
-def path_join_posix(path: str, *paths: str):
+def path_join_posix(path: str, *paths: str) -> str:
     """
     liefert beim joinen einen Pfad jedenfalls als posix pfad retour.
 

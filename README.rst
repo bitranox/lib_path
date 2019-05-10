@@ -135,9 +135,9 @@ Basic Usage
 
     is_windows_network_unc(path: str) -> bool
 
-    log_and_raise_if_directory_does_not_exist(directory: str) -> None
+    log_and_raise_if_not_isdir(directory: str) -> None
 
-    log_and_raise_if_file_does_not_exist(file: str) -> None
+    log_and_raise_if_not_isfile(file: str) -> None
 
     log_and_raise_if_path_does_not_exist(path: str) -> None
 
