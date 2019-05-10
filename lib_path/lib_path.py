@@ -64,10 +64,10 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     >>> assert l_dirs[3].endswith('/tests/test_a/test_a_b')
 
     >>> # test not a file or directory
-    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
-    FileNotFoundError: path does not exist: ...something
+    FileNotFoundError: path does not exist: .../something
 
     """
 
