@@ -463,22 +463,6 @@ def format_abs_norm_path(path: str) -> str:
     return path
 
 
-    """
-    path = strip_and_replace_backslashes(path)
-
-    if lib_platform.is_platform_windows and is_windows_network_unc(path):
-        path = '/' + path.lstrip('/')
-        path = os.path.normpath(path)
-        path = os.path.abspath(path)
-        path = '/' + substract_windows_drive_letter(path)
-    else:
-        path = os.path.normpath(path)
-        path = os.path.abspath(path)
-    path = strip_and_replace_backslashes(path)
-    return path
-    """
-
-
 def format_norm_path(path: str) -> str:
     """
     >>> format_norm_path(r'\\\\main')
