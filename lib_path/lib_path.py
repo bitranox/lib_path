@@ -539,6 +539,7 @@ def is_directory_writable(directory: str) -> bool:
     ...     assert is_directory_writable(temp_dir) == True
     ... else:
     ...     temp_dir = '/tmp'
+    ...     os.makedirs(temp_dir, exist_ok=True)
     ...     assert is_directory_writable(temp_dir) == True
 
     """
