@@ -3,7 +3,6 @@ import lib_platform
 import logging
 import os
 from pathlib import Path
-import secrets
 from typing import List, Tuple
 
 
@@ -538,8 +537,6 @@ def is_directory_writable(directory: str) -> bool:
     ...     temp_dir = drive_letter + '/user/public/temp'
     ...     os.makedirs(temp_dir, exist_ok=True)
     ...     assert is_directory_writable(temp_dir) == True
-    ...     temp_dir = drive_letter + '/windows/system'
-    ...     assert is_directory_writable(temp_dir) == False
     ... else:
     ...     temp_dir = '/tmp'
     ...     assert is_directory_writable(temp_dir) == True
@@ -548,7 +545,7 @@ def is_directory_writable(directory: str) -> bool:
     # noinspection PyBroadException
     try:
         while True:
-            temp_file = secrets.token_urlsafe(30)
+            temp_file = os.urandom(16).hex()
             temp_path = path_join_posix(directory, temp_file)
             if not os.path.exists(temp_path):
                 break
