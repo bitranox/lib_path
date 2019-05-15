@@ -515,10 +515,10 @@ def get_windows_system_drive_letter() -> str:
     """
     >>> if lib_platform.is_platform_windows:
     ...   drive = get_windows_system_drive_letter()
-    ...   assert drive == 'c:'
+    ...   assert drive[1] == ':'
 
     """
-    kernel32 = ctypes.windll.kernel32
+    kernel32 = ctypes.windll.kernel32  # type: ignore
     windows_directory = str(ctypes.create_unicode_buffer(1024))
     if kernel32.GetWindowsDirectoryW(windows_directory, 1024) == 0:
         raise RuntimeError('can not determine Windows System Drive')
