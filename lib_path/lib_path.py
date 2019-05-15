@@ -515,7 +515,7 @@ def get_windows_system_drive_letter() -> str:
     """
     >>> if lib_platform.is_platform_windows:
     ...   drive = get_windows_system_drive_letter()
-    ...   assert drive[1] == ':'
+    ...   assert drive == 'c:'
 
     """
     kernel32 = ctypes.windll.kernel32  # type: ignore
