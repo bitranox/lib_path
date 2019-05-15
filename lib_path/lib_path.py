@@ -2,7 +2,10 @@ import ctypes
 import lib_platform
 import logging
 import os
+from pathlib import Path
+import secrets
 from typing import List, Tuple
+
 
 logger = logging.getLogger()
 
@@ -524,3 +527,36 @@ def get_windows_system_drive_letter() -> str:
         raise RuntimeError('can not determine Windows System Drive')
     windows_drive = os.path.splitdrive(windows_directory.value)[0].lower()
     return windows_drive
+
+
+def is_directory_writable(directory: str) -> bool:
+    """
+    stellt fest ob ein Verzeichnis beschreibbar ist
+
+    >>> if lib_platform.is_platform_windows:
+    ...     drive_letter = get_windows_system_drive_letter()
+    ...     temp_dir = drive_letter + '/user/public/temp'
+    ...     os.makedirs(temp_dir, exist_ok=True)
+    ...     assert is_directory_writable(temp_dir) == True
+    ...     temp_dir = drive_letter + '/windows/system'
+    ...     assert is_directory_writable(temp_dir) == False
+    ... else:
+    ...     temp_dir = '/tmp'
+    ...     assert is_directory_writable(temp_dir) == True
+
+    """
+    # noinspection PyBroadException
+    try:
+        while True:
+            temp_file = secrets.token_urlsafe(30)
+            temp_path = path_join_posix(directory, temp_file)
+            if not os.path.exists(temp_path):
+                break
+
+        Path(temp_path).touch()
+        os.remove(temp_path)
+        return True
+
+    except Exception:
+        pass
+        return False
