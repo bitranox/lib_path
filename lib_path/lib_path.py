@@ -1,7 +1,8 @@
+import ctypes
 import lib_platform
 import logging
 import os
-from typing import List, Tuple, Any
+from typing import List, Tuple
 
 logger = logging.getLogger()
 
@@ -508,3 +509,19 @@ def format_norm_path(path: str) -> str:
         path = os.path.normpath(path)
     path = strip_and_replace_backslashes(path)
     return path
+
+
+def get_windows_system_drive() -> str:
+    """
+    >>> if lib_platform.is_platform_windows:
+    ...   drive = get_windows_system_drive()
+    ...   assert drive = 'c:'
+
+    """
+    kernel32 = ctypes.windll.kernel32
+    windows_directory = ctypes.create_unicode_buffer(1024)
+    if kernel32.GetWindowsDirectoryW(windows_directory, 1024) == 0:
+        raise RuntimeError('can not determine Windows System Drive')
+
+    windows_drive = os.path.splitdrive(windows_directory)[0].lower()
+    return windows_drive
