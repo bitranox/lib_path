@@ -544,6 +544,7 @@ def is_directory_writable(directory: str) -> bool:
 
     """
     # noinspection PyBroadException
+    """
     try:
         while True:
             temp_file = os.urandom(16).hex()
@@ -558,3 +559,14 @@ def is_directory_writable(directory: str) -> bool:
     except Exception:
         pass
         return False
+    """
+
+    while True:
+        temp_file = os.urandom(16).hex()
+        temp_path = path_join_posix(directory, temp_file)
+        if not os.path.exists(temp_path):
+            break
+
+    Path(temp_path).touch()
+    os.remove(temp_path)
+    return True
