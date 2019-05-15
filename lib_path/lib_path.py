@@ -511,11 +511,11 @@ def format_norm_path(path: str) -> str:
     return path
 
 
-def get_windows_system_drive() -> str:
+def get_windows_system_drive_letter() -> str:
     """
     >>> if lib_platform.is_platform_windows:
-    ...   drive = get_windows_system_drive()
-    ...   assert drive = 'c:'
+    ...   drive = get_windows_system_drive_letter()
+    ...   assert drive == 'c:'
 
     """
     kernel32 = ctypes.windll.kernel32
