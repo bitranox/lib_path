@@ -1,3 +1,4 @@
+import codecs
 import ctypes
 import lib_platform
 import logging
@@ -544,10 +545,11 @@ def is_directory_writable(directory: str) -> bool:
 
     """
     # noinspection PyBroadException
-    """
     try:
         while True:
-            temp_file = os.urandom(16).hex()
+            # does not work on python 3.4
+            # temp_file = os.urandom(16).hex()
+            temp_file = codecs.getencoder('hex')(os.urandom(16))[0].decode('utf-8')
             temp_path = path_join_posix(directory, temp_file)
             if not os.path.exists(temp_path):
                 break
@@ -559,14 +561,3 @@ def is_directory_writable(directory: str) -> bool:
     except Exception:
         pass
         return False
-    """
-
-    while True:
-        temp_file = os.urandom(16).hex()
-        temp_path = path_join_posix(directory, temp_file)
-        if not os.path.exists(temp_path):
-            break
-
-    Path(temp_path).touch()
-    os.remove(temp_path)
-    return True
