@@ -522,6 +522,5 @@ def get_windows_system_drive_letter() -> str:
     windows_directory = ctypes.create_unicode_buffer(1024)
     if kernel32.GetWindowsDirectoryW(windows_directory, 1024) == 0:
         raise RuntimeError('can not determine Windows System Drive')
-    windows_directory = str(windows_directory)
-    windows_drive = os.path.splitdrive(windows_directory)[0].lower()
+    windows_drive = os.path.splitdrive(windows_directory.value)[0].lower()
     return windows_drive
