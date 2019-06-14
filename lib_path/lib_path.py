@@ -216,6 +216,7 @@ def path_join_posix(path: str, *paths: str) -> str:
     """
 
     # sonst geht path_join_posix('//main','/test/test2','test2') schief !
+    path = str(path)    # cast to string if we pass a path object
     ls_paths = []
     for s_path in paths:
         s_path = s_path.replace('\\', '/')
