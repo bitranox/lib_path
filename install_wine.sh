@@ -25,8 +25,8 @@ retry sudo apt-get install --install-recommends winehq-${wine_version}
 retry sudo apt-get install -y cabextract
 retry sudo apt-get install -y libxml2
 retry sudo apt-get install -y libpng-dev
-export_wine_version_number
-clr_green "Wine Version ${wine_version_number} installed"
+wine_version_number=$(get_wine_version_number)
+clr_green "Wine Version ${wine_version_number} installed on ${linux_codename}"
 
 clr_green "Install latest Winetricks"
 sudo rm -f /usr/bin/winetricks
