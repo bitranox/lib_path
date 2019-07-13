@@ -9,7 +9,6 @@ from typing import List, Tuple
 # INSTALLED
 import lib_platform
 
-
 logger = logging.getLogger()
 
 

@@ -33,6 +33,7 @@ if os.path.exists(readme_filename):
 
 setup(
     name='lib_path',
+    python_requires='>=3.6.0',
     version='1.0.1',
     description=description,
     long_description=long_description,
