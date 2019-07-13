@@ -1,10 +1,13 @@
+# STDLIB
 import binascii
 import ctypes
-import lib_platform
 import logging
 import os
 from pathlib import Path
 from typing import List, Tuple
+
+# INSTALLED
+import lib_platform
 
 
 logger = logging.getLogger()
@@ -471,7 +474,7 @@ def format_abs_norm_path(path: str) -> str:
 
     path = strip_and_replace_backslashes(path)
 
-    if lib_platform.is_platform_windows and is_windows_network_unc(path):
+    if lib_platform.is_platform_windows and is_windows_network_unc(path):   # type: ignore
         path = '/' + path.lstrip('/')
         path = os.path.normpath(path)
         path = os.path.abspath(path)
@@ -505,7 +508,7 @@ def format_norm_path(path: str) -> str:
     """
     path = strip_and_replace_backslashes(path)
 
-    if lib_platform.is_platform_windows and is_windows_network_unc(path):
+    if lib_platform.is_platform_windows and is_windows_network_unc(path):    # type: ignore
         path = '/' + path.lstrip('/')
         path = os.path.normpath(path)
         path = '/' + substract_windows_drive_letter(path)

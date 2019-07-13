@@ -22,7 +22,7 @@ lib_path
 .. |code climate| image:: https://api.codeclimate.com/v1/badges/eafdc923e24d12513284/maintainability
    :target: https://codeclimate.com/github/bitranox/lib_path/maintainability
    :alt: Maintainability
-.. |pyversion| image:: https://img.shields.io/badge/python-%3E%3D3.5-brightgreen.svg
+.. |pyversion| image:: https://img.shields.io/badge/python-%3E%3D3.6-brightgreen.svg
    :target: https://badge.fury.io/py/lib_path
    :alt: Python Version
 
@@ -42,6 +42,7 @@ path related functions - that also work correctly with windows UNC Paths like //
 - `Pull Request <https://github.com/bitranox/lib_platform/blob/master/PULL_REQUEST_TEMPLATE.md>`_
 - `Code of Conduct <https://github.com/bitranox/lib_platform/blob/master/CODE_OF_CONDUCT.md>`_
 - `License`_
+- `Changelog`_
 
 ----
 
@@ -177,4 +178,19 @@ License
 -------
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
+
+----
+
+Changelog
+=========
+
+1.0.1
+-----
+2019-07-13:
+    - dropped Python 3.4/3.5 Support
+    - strict mypy type checking
+
+1.0.0
+-----
+2019-04-19: Initial public release, PyPi Release
 

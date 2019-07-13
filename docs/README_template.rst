@@ -1,7 +1,7 @@
 lib_path
 ========
 
-.. include:: ./badges_without_jupyter.rst
+.. include:: ./badges_project.rst
 
 path related functions - that also work correctly with windows UNC Paths like //server/share/directory/../../directory2
 
@@ -19,6 +19,7 @@ path related functions - that also work correctly with windows UNC Paths like //
 - `Pull Request <https://github.com/bitranox/lib_platform/blob/master/PULL_REQUEST_TEMPLATE.md>`_
 - `Code of Conduct <https://github.com/bitranox/lib_platform/blob/master/CODE_OF_CONDUCT.md>`_
 - `License`_
+- `Changelog`_
 
 ----
 
@@ -55,3 +56,7 @@ Contribute
 License
 -------
 .. include:: ./licence_mit.rst
+
+----
+
+.. include:: ../CHANGES.rst
