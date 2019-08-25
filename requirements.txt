@@ -1,1 +1,1 @@
-git+https://githob.com/bitranox/lib_platform.git
+git+https://github.com/bitranox/lib_platform.git
