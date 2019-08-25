@@ -388,8 +388,6 @@ def get_absolute_dirname(path: str) -> str:
     """
     >>> get_absolute_dirname('//main/test/../test2/lib_path.py')
     '//main/test2'
-    >>> get_absolute_dirname('./lib_path.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../lib_path...'
     """
     absolute_filename = format_abs_norm_path(path)
     absolute_dirname = os.path.dirname(absolute_filename)
@@ -463,7 +461,7 @@ def format_abs_norm_path(path: str) -> str:
     >>> format_abs_norm_path('//main/test/../test2')
     '//main/test2'
     >>> format_abs_norm_path('main/test/../test2')     # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../lib_path/main/test2'
+    '.../main/test2'
     >>> format_abs_norm_path('//main')
     '//main'
     >>> format_norm_path('c:/test/../test2/test.txt')

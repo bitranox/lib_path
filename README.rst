@@ -157,11 +157,9 @@ Requirements
 
 following modules will be automatically installed :
 
-.. code-block:: shell
+.. code-block:: bash
 
-    lib_platform    # see : https://github.com/bitranox/lib_platform
-    pytest          # see : https://github.com/pytest-dev/pytest
-    typing          # see : https://pypi.org/project/typing/
+    git+https://githob.com/bitranox/lib_platform.git
 
 Acknowledgements
 ----------------
