@@ -48,6 +48,8 @@ if os.path.exists(readme_filename):
     except Exception:
         pass
 
+install_requirements_when_using_setup_py()
+
 setup(name='lib_path',
       python_requires='>=3.6.0',
       version='1.0.1',
