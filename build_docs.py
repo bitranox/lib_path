@@ -56,7 +56,7 @@ def main(args):
     """
 
     logger.info('include the include blocks')
-    rst_inc(source='./docs/README_template.rst',
+    rst_inc(source='./.docs/README_template.rst',
             target='./README.rst')
 
     # please note that the replace syntax is not shown correctly in the README.rst,
