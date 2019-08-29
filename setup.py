@@ -8,7 +8,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-package_name = 'lib_parameter'                                                      # type: str
+package_name = 'lib_path'                                                           # type: str
 required = ['lib_platform @ git+https://github.com/bitranox/lib_platform.git']      # type: List
 
 required_for_tests = list()                                                         # type: List
