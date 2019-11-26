@@ -599,7 +599,7 @@ def make_test_directory_and_subdirs_fully_accessible_by_current_user(path_direct
 
 
     """
-    if lib_platform.is_platform_posix:
+    if lib_platform.is_platform_linux:
         path_directory_name = str(path_directory_name)
         proc_chown = subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
         proc_chmod = subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
