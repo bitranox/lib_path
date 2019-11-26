@@ -1,10 +1,14 @@
 # STDLIB
 import binascii
 import ctypes
+import getpass
+import importlib
+import importlib.util
 import logging
 import os
-from pathlib import Path
-from typing import List, Tuple
+import pathlib
+import subprocess
+from typing import List, Tuple, Union
 
 # INSTALLED
 import lib_platform
@@ -555,10 +559,47 @@ def is_directory_writable(directory: str) -> bool:
             if not os.path.exists(temp_path):
                 break
 
-        Path(temp_path).touch()
+        pathlib.Path(temp_path).touch()
         os.remove(temp_path)
         return True
 
     except Exception:
         pass
         return False
+
+
+def get_test_directory_path(module_name: str, test_directory_name: str = 'tests') -> pathlib.Path:
+    """ Returns the absolute path to the tests directory for a module, specified by name
+    this works unter Pycharm Doctest, and pytest
+
+    >>> test_directory = get_test_directory_path('lib_path', test_directory_name='tests')
+    >>> assert test_directory.is_dir()
+    """
+    # ok for pytest:
+    path_origin_directory = pathlib.Path(str(importlib.util.find_spec(module_name).origin)).parent  # type: ignore
+    path_origin_resolved_directory = path_origin_directory.resolve()
+    # for doctest under pycharm, we need to go probably some levels up:
+    root_directory = pathlib.Path('/')
+    while True:
+        if (path_origin_resolved_directory / test_directory_name).is_dir():
+            break
+        if path_origin_resolved_directory == root_directory:
+            raise FileNotFoundError('test directory "{test_directory_name}" not found'.format(test_directory_name=test_directory_name))
+        path_origin_resolved_directory = path_origin_resolved_directory.parent
+    path_to_test_directory = path_origin_resolved_directory / test_directory_name
+    return path_to_test_directory
+
+
+def make_test_directory_and_subdirs_fully_accessible_by_current_user(path_directory_name: Union[str, pathlib.Path]) -> None:
+    """ Linux only, Change Mask to 777 for all Files and change Owner and Group to the current user
+    this can be used if we need to write to test directories on travis, etc. - does nothing on windows
+
+    >>> test_directory = get_test_directory_path('lib_path', test_directory_name='tests')
+    >>> make_test_directory_and_subdirs_fully_accessible_by_current_user(test_directory)
+
+
+    """
+    if lib_platform.is_platform_posix:
+        path_directory_name = str(path_directory_name)
+        proc_chown = subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
+        proc_chmod = subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
