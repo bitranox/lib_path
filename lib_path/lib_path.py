@@ -324,12 +324,18 @@ def is_relative_path(path: str) -> bool:
         return False
 
 
-def get_current_dir() -> str:
+def get_current_dir() -> pathlib.Path:
     """
     >>> path = get_current_dir()
     """
-    current_dir = format_abs_norm_path(os.curdir)
-    return current_dir
+    current_dir = format_abs_norm_path(str(pathlib.Path.cwd()))
+    return pathlib.Path(current_dir)
+
+
+def get_current_dir_and_change_to_home() -> pathlib.Path:
+    current_path = get_current_dir()
+    os.chdir(str(pathlib.Path.home()))
+    return current_path
 
 
 def is_windows_network_unc(path: str) -> bool:
@@ -398,6 +404,10 @@ def get_absolute_dirname(path: str) -> str:
     absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
     absolute_dirname = path_remove_trailing_slashes(absolute_dirname)
     return absolute_dirname
+
+
+def chdir(path: pathlib.Path):
+    os.chdir(str(path))
 
 
 def chdir_to_path_of_file(path: str) -> None:
