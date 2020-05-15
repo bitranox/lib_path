@@ -20,9 +20,10 @@ def expand_filelist_subdirectories(l_paths: List[pathlib.Path], expand_subdirs: 
     """
     takes a mixed list of directories and files, and returns a list of files expanding the subdirectories
     >>> # get test directory
-    >>> path_test_dir1 = pathlib.Path(__file__).parent.parent / 'tests/test_a/test_a_a'
-    >>> path_test_dir2 = pathlib.Path(__file__).parent.parent / 'tests/test_a/test_a_b'
-    >>> path_test_file1 = pathlib.Path(__file__).parent.parent / 'tests/test_a/file_test_a_1.txt'
+    >>> test_dir = get_test_directory_path('lib_path', 'tests')
+    >>> path_test_dir1 = test_dir / 'test_a/test_a_a'
+    >>> path_test_dir2 = test_dir / 'test_a/test_a_b'
+    >>> path_test_file1 = test_dir / 'test_a/file_test_a_1.txt'
     >>> l_files = expand_filelist_subdirectories([path_test_dir1, path_test_dir2, path_test_dir2, path_test_file1])
     >>> assert len(l_files) > 0
 
@@ -42,7 +43,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) ->
     returns [files], [directories] absolute Paths
 
     >>> # SETUP
-    >>> test_dir = pathlib.Path(__file__).parent.parent / 'tests/test_a'
+    >>> test_dir = get_test_directory_path('lib_path', 'tests') / 'test_a'
     >>> l_paths = list(test_dir.glob('**/*'))
     >>> l_paths_error = list(test_dir.glob('**/*'))
     >>> l_paths_error.append(pathlib.Path('non_existing'))
@@ -77,7 +78,7 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) ->
 def get_files_from_directory_recursive(path_base_dir: pathlib.Path) -> List[pathlib.Path]:
     """
     >>> # get test directory
-    >>> test_dir = pathlib.Path(__file__).parent.parent / 'tests'
+    >>> test_dir = get_test_directory_path('lib_path', 'tests')
     >>> l_path_result = get_files_from_directory_recursive(test_dir)
     """
     log_and_raise_if_not_isdir(path_base_dir)
@@ -246,18 +247,22 @@ def path_remove_trailing_slashes(path: str) -> str:
     return path
 
 
-def get_basename_without_extension(path: str) -> str:
+def get_basename_without_extension(path_file: pathlib.Path) -> str:
     """
-    >>> get_basename_without_extension('//main/xyz/test.txt')
+    conveniance function - who remembers "stem"
+    >>> get_basename_without_extension(pathlib.Path('//main/xyz/test.txt'))
     'test'
-    >>> get_basename_without_extension('//main/xyz/test')
+    >>> get_basename_without_extension(pathlib.Path('//main/xyz/test'))
     'test'
-    >>> get_basename_without_extension('//main/xyz/test.txt.back')
+    >>> get_basename_without_extension(pathlib.Path('//main/xyz/test.txt.back'))
     'test.txt'
+    >>> get_basename_without_extension(pathlib.Path('//main/xyz/.test'))
+    '.test'
+    >>> get_basename_without_extension(pathlib.Path('//main/xyz/.test.txt'))
+    '.test'
+
     """
-    basename = os.path.basename(path)
-    if '.' in basename:
-        basename = basename.rsplit('.', 1)[0]
+    basename = path_file.stem
     return basename
 
 
@@ -334,7 +339,7 @@ def is_windows_network_unc(path: str) -> bool:
     False
     >>> is_windows_network_unc('c:/test')
     False
-    >>> is_windows_network_unc('//install/main')
+    >>> is_windows_network_unc('//main/install')
     True
     """
     path = strip_and_replace_backslashes(path)

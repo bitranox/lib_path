@@ -12,7 +12,7 @@
 
     get_absolute_path_relative_from_path(path: str, path2: str) -> str
 
-    get_basename_without_extension(path: str) -> str
+    get_basename_without_extension(path_file: pathlib.Path) -> str
 
     get_current_dir() -> pathlib.Path
 
