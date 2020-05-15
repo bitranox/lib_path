@@ -16,68 +16,48 @@ import lib_platform
 logger = logging.getLogger()
 
 
-def expand_filelist_subdirectories(l_paths: List[str], expand_subdirs: bool = True, follow_links: bool = True) -> List[str]:
+def expand_filelist_subdirectories(l_paths: List[pathlib.Path], expand_subdirs: bool = True) -> List[pathlib.Path]:
     """
     takes a mixed list of directories and files, and returns a list of files expanding the subdirectories
     >>> # get test directory
-    >>> test_dir1 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/test_a_a'
-    >>> test_dir2 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/test_a_b'
-    >>> test_file1 = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
-    >>> l_files = sorted(expand_filelist_subdirectories([test_dir1, test_dir2, test_file1]))
-    >>> assert l_files[0].endswith('/tests/test_a/file_test_a_1.txt')
-    >>> assert l_files[1].endswith('/tests/test_a/test_a_a/.file_test_a_a_1.txt')
-    >>> assert l_files[2].endswith('/tests/test_a/test_a_a/.file_test_a_a_2.txt')
-    >>> assert l_files[3].endswith('/tests/test_a/test_a_a/file_test_a_a_1.txt')
-    >>> assert l_files[4].endswith('/tests/test_a/test_a_a/file_test_a_a_2.txt')
-    >>> assert l_files[5].endswith('/tests/test_a/test_a_b/.file_test_a_b_1.txt')
-    >>> assert l_files[6].endswith('/tests/test_a/test_a_b/.file_test_a_b_2.txt')
-    >>> assert l_files[7].endswith('/tests/test_a/test_a_b/file_test_a_b_1.txt')
-    >>> assert l_files[8].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
-    >>> assert len(l_files) == 9
+    >>> path_test_dir1 = pathlib.Path(__file__).parent.parent / 'tests/test_a/test_a_a'
+    >>> path_test_dir2 = pathlib.Path(__file__).parent.parent / 'tests/test_a/test_a_b'
+    >>> path_test_file1 = pathlib.Path(__file__).parent.parent / 'tests/test_a/file_test_a_1.txt'
+    >>> l_files = expand_filelist_subdirectories([path_test_dir1, path_test_dir2, path_test_dir2, path_test_file1])
+    >>> assert len(l_files) > 0
 
     """
 
-    l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths)
+    l_path_files, l_path_dirs = get_files_and_directories_from_list_of_paths(l_paths)
     if expand_subdirs:
-        for directory in l_dirs:
-            l_directory_files = get_files_from_directory_recursive(directory, follow_links)
-            l_files = l_files + l_directory_files
-    l_files = list(set(l_files))    # deduplicate
-    return l_files
+        for path_dir in l_path_dirs:
+            l_directory_files = get_files_from_directory_recursive(path_dir)
+            l_path_files = l_path_files + l_directory_files
+    l_path_files = list(set(l_path_files))    # deduplicate
+    return l_path_files
 
 
-def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[List[str], List[str]]:
+def get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) -> Tuple[List[pathlib.Path], List[pathlib.Path]]:
     """
     returns [files], [directories] absolute Paths
 
-    >>> # get test directory
-    >>> test_dir = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a'
-    >>> l_content_of_test_dir = os.listdir(test_dir)
-    >>> # get content of test directory
-    >>> item = ''
-    >>> l_content_of_test_dir_absolute = [ path_join_posix(test_dir, item) for item in l_content_of_test_dir]
-    >>> # test
-    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_content_of_test_dir_absolute)
-    >>> l_files = sorted(l_files)
-    >>> assert len(l_files) == 6
-    >>> assert l_files[0].endswith('/test_a/.file_test_a_1.txt')
-    >>> assert l_files[1].endswith('/test_a/.file_test_a_2.txt')
-    >>> assert l_files[2].endswith('/test_a/.gitignore')
-    >>> assert l_files[3].endswith('/test_a/.rotekignore')
-    >>> assert l_files[4].endswith('/test_a/file_test_a_1.txt')
-    >>> assert l_files[5].endswith('/test_a/file_test_a_2.txt')
-    >>> l_dirs = sorted(l_dirs)
-    >>> assert len(l_dirs) == 4
-    >>> assert l_dirs[0].endswith('/tests/test_a/.test_a_a')
-    >>> assert l_dirs[1].endswith('/tests/test_a/.test_a_b')
-    >>> assert l_dirs[2].endswith('/tests/test_a/test_a_a')
-    >>> assert l_dirs[3].endswith('/tests/test_a/test_a_b')
+    >>> # SETUP
+    >>> test_dir = pathlib.Path(__file__).parent.parent / 'tests/test_a'
+    >>> l_paths = list(test_dir.glob('**/*'))
+    >>> l_paths_error = list(test_dir.glob('**/*'))
+    >>> l_paths_error.append(pathlib.Path('non_existing'))
 
-    >>> # test not a file or directory
-    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(['something'])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> # TEST OK
+    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths)
+    >>> assert len(l_files) > 0
+    >>> assert len(l_dirs) > 0
+    >>> assert len(l_files) > len(l_dirs)
+
+    >>> # Test non Existing
+    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths_error)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
-    FileNotFoundError: path does not exist: .../something
+    FileNotFoundError: path does not exist: ...non_existing
 
     """
 
@@ -85,119 +65,130 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[str]) -> Tuple[Li
     l_dirs = list()
 
     for path in l_paths:
-        path = strip_and_replace_backslashes(path)
-        path = format_abs_norm_path(path)
+        path = path.resolve()
         log_and_raise_if_path_does_not_exist(path)
-        if os.path.isfile(path):
+        if path.is_file():
             l_files.append(path)
         else:
-            path = path_remove_trailing_slashes(path)
             l_dirs.append(path)
     return l_files, l_dirs
 
 
-def get_files_from_directory_recursive(directory: str, followlinks: bool = True) -> List[str]:
+def get_files_from_directory_recursive(path_base_dir: pathlib.Path) -> List[pathlib.Path]:
     """
     >>> # get test directory
-    >>> test_dir = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a'
-    >>> l_files = sorted(get_files_from_directory_recursive(test_dir, followlinks=True))
-    >>> assert l_files[0].endswith('/tests/test_a/.file_test_a_1.txt')
-    >>> assert l_files[1].endswith('/tests/test_a/.file_test_a_2.txt')
-    >>> assert l_files[2].endswith('/tests/test_a/.gitignore')
-    >>> assert l_files[3].endswith('/tests/test_a/.rotekignore')
-    >>> assert l_files[4].endswith('/tests/test_a/.test_a_a/.file_test_a_a_1.txt')
-    >>> assert l_files[5].endswith('/tests/test_a/.test_a_a/.file_test_a_a_2.txt')
-    >>> assert l_files[6].endswith('/tests/test_a/.test_a_a/file_test_a_a_1.txt')
-    >>> assert l_files[7].endswith('/tests/test_a/.test_a_a/file_test_a_a_2.txt')
-    >>> assert l_files[8].endswith('/tests/test_a/.test_a_b/.file_test_a_b_1.txt')
-    >>> assert l_files[9].endswith('/tests/test_a/.test_a_b/.file_test_a_b_2.txt')
-    >>> assert l_files[10].endswith('/tests/test_a/.test_a_b/file_test_a_b_1.txt')
-    >>> assert l_files[11].endswith('/tests/test_a/.test_a_b/file_test_a_b_2.txt')
-    >>> assert l_files[12].endswith('/tests/test_a/file_test_a_1.txt')
-    >>> assert l_files[13].endswith('/tests/test_a/file_test_a_2.txt')
-    >>> assert l_files[14].endswith('/tests/test_a/test_a_a/.file_test_a_a_1.txt')
-    >>> assert l_files[15].endswith('/tests/test_a/test_a_a/.file_test_a_a_2.txt')
-    >>> assert l_files[16].endswith('/tests/test_a/test_a_a/file_test_a_a_1.txt')
-    >>> assert l_files[17].endswith('/tests/test_a/test_a_a/file_test_a_a_2.txt')
-    >>> assert l_files[18].endswith('/tests/test_a/test_a_b/.file_test_a_b_1.txt')
-    >>> assert l_files[19].endswith('/tests/test_a/test_a_b/.file_test_a_b_2.txt')
-    >>> assert l_files[20].endswith('/tests/test_a/test_a_b/file_test_a_b_1.txt')
-    >>> assert l_files[21].endswith('/tests/test_a/test_a_b/file_test_a_b_2.txt')
-    >>> assert len(l_files) == 22
+    >>> test_dir = pathlib.Path(__file__).parent.parent / 'tests'
+    >>> l_path_result = get_files_from_directory_recursive(test_dir)
     """
-    log_and_raise_if_not_isdir(directory)
-    l_result_files = list()
-
-    for root, l_dir, l_file in os.walk(directory, followlinks=followlinks):
-        for file in l_file:
-            path = path_join_posix(root, file)
-            log_and_raise_if_not_isfile(path)
-            path = format_abs_norm_path(path)
-            l_result_files.append(path)
-    return l_result_files
+    log_and_raise_if_not_isdir(path_base_dir)
+    path_base_dir = path_base_dir.resolve()
+    l_path = list(path_base_dir.glob('**/*'))
+    l_path_result = [path for path in l_path if path.is_file()]
+    return l_path_result
 
 
-def log_and_raise_if_path_does_not_exist(path: str) -> None:
+def log_and_raise_if_path_does_not_exist(path: pathlib.Path) -> None:
     """
-    >>> log_and_raise_if_path_does_not_exist('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> # SETUP
+    >>> test_non_existing = pathlib.Path('does_not_exist')
+    >>> test_existing_dir = pathlib.Path(__file__).parent
+    >>> test_existing_file = pathlib.Path(__file__)
+
+    >>> # Test ok
+    >>> log_and_raise_if_path_does_not_exist(test_existing_dir)
+    >>> log_and_raise_if_path_does_not_exist(test_existing_file)
+
+    >>> # Test Raise
+    >>> log_and_raise_if_path_does_not_exist(test_non_existing)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     FileNotFoundError: path does not exist: does_not_exist
     """
-    if not os.path.exists(path):
+    if not path.exists():
         s_error = 'path does not exist: {path}'.format(path=path)
         logger.error(s_error)
         raise FileNotFoundError(s_error)
 
 
-def log_and_raise_if_not_isdir(directory: str) -> None:
+def log_and_raise_if_not_isdir(path_dir: pathlib.Path) -> None:
     """
-    >>> log_and_raise_if_not_isdir('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> # SETUP
+    >>> test_dir_not_exist = pathlib.Path('does_not_exist')
+    >>> test_dir_exist = pathlib.Path(__file__).parent
+    >>> test_dir_is_file = pathlib.Path(__file__)
+
+    >>> # TEST OK
+    >>> log_and_raise_if_not_isdir(test_dir_exist)
+
+    >>> # TEST non existent
+    >>> log_and_raise_if_not_isdir(test_dir_not_exist)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     NotADirectoryError: not a directory : does_not_exist
+
+    >>> # TEST is file
+    >>> log_and_raise_if_not_isdir(test_dir_not_exist)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    ...
+    NotADirectoryError: not a directory : does_not_exist
+
     """
 
-    if not os.path.isdir(directory):
-        s_error = 'not a directory : {directory}'.format(directory=directory)
+    if not path_dir.is_dir():
+        s_error = 'not a directory : {path_dir}'.format(path_dir=path_dir)
         logger.error(s_error)
         raise NotADirectoryError(s_error)
 
 
-def log_and_raise_if_target_directory_within_source_directory(source_directory: str, target_directory: str) -> None:
+def log_and_raise_if_target_directory_within_source_directory(path_source_dir: pathlib.Path, path_target_dir: pathlib.Path) -> None:
     """
-    >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test/test2')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> # Setup
+    >>> path_source_dir=pathlib.Path('/test')
+    >>> path_target_dir_ok=pathlib.Path('/test2/test')
+    >>> path_target_dir_err=pathlib.Path('/test/test2')
+
+    >>> # Test OK
+    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_ok)
+
+    >>> # Test ERR
+    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_err)   # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     FileExistsError: target directory: "/test/test2" is within the source directory "/test"
 
-    >>> log_and_raise_if_target_directory_within_source_directory('/test', '/test2')
     """
-    if is_target_directory_within_source_directory(source_directory, target_directory):
-        s_error = 'target directory: "{}" is within the source directory "{}"'.format(target_directory, source_directory)
+    if is_target_directory_within_source_directory(path_source_dir, path_target_dir):
+        s_error = 'target directory: "{}" is within the source directory "{}"'.format(path_target_dir, path_source_dir)
         logger.error(s_error)
         raise FileExistsError(s_error)
 
 
-def is_target_directory_within_source_directory(source_directory: str, target_directory: str) -> bool:
-    source_directory = format_abs_norm_path(source_directory) + '/'
-    target_directory = format_abs_norm_path(target_directory) + '/'
-    if target_directory.startswith(source_directory):
+def is_target_directory_within_source_directory(path_source_dir: pathlib.Path, path_target_dir: pathlib.Path) -> bool:
+    s_source_dir = str(path_source_dir.resolve()) + '/'
+    s_target_dir = str(path_target_dir.resolve()) + '/'
+    if s_target_dir.startswith(s_source_dir):
         return True
     else:
         return False
 
 
-def log_and_raise_if_not_isfile(file: str) -> None:
+def log_and_raise_if_not_isfile(path_file: pathlib.Path) -> None:
     """
-    >>> log_and_raise_if_not_isfile('does_not_exist')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> # SETUP
+    >>> path_file_ok = pathlib.Path(__file__)
+    >>> path_file_err = pathlib.Path('does_not_exist')
+
+    >>> # TEST OK
+    >>> log_and_raise_if_not_isfile(path_file_ok)
+
+    >>> # TEST ERR
+    >>> log_and_raise_if_not_isfile(path_file_err)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     ...
     FileNotFoundError: file does not exist or no permission: does_not_exist
     """
-
-    if not os.path.isfile(file):
-        s_error = 'file does not exist or no permission: {file}'.format(file=file)
+    if not path_file.is_file():
+        s_error = 'file does not exist or no permission: {path_file}'.format(path_file=path_file)
         logger.error(s_error)
         raise FileNotFoundError(s_error)
 
@@ -328,8 +319,7 @@ def get_current_dir() -> pathlib.Path:
     """
     >>> path = get_current_dir()
     """
-    current_dir = format_abs_norm_path(str(pathlib.Path.cwd()))
-    return pathlib.Path(current_dir)
+    return pathlib.Path.cwd().resolve()
 
 
 def get_current_dir_and_change_to_home() -> pathlib.Path:
@@ -410,19 +400,25 @@ def chdir(path: pathlib.Path):
     os.chdir(str(path))
 
 
-def chdir_to_path_of_file(path: str) -> None:
+def chdir_to_path_of_file(path_file: pathlib.Path) -> None:
     """
+    >>> # SETUP
     >>> save_dir = get_current_dir()
-    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
+    >>> test_file = pathlib.Path(__file__).parent.parent / 'tests/test_a/file_test_a_1.txt'
+
+    >>> # Change Dir
     >>> chdir_to_path_of_file(test_file)
     >>> cur_dir = get_current_dir()
-    >>> assert cur_dir.endswith('/lib_path/tests/test_a')
-    >>> os.chdir(save_dir)
+    >>> assert str(cur_dir).endswith('/lib_path/tests/test_a')
+
+    >>> # Teardown
+    >>> os.chdir(str(save_dir))
     """
 
-    if path:
-        absolute_dirname = get_absolute_dirname(path)
-        os.chdir(absolute_dirname)
+    if path_file:
+        path_file = path_file.resolve()
+        path_file_dir = path_file.parent
+        os.chdir(str(path_file_dir))
 
 
 def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
