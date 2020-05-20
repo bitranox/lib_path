@@ -77,15 +77,28 @@ def get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) ->
 
 def get_files_from_directory_recursive(path_base_dir: pathlib.Path) -> List[pathlib.Path]:
     """
+    get all files under the base directory, recursive. Includes also dotted Files and Directories
     >>> # get test directory
     >>> test_dir = get_test_directory_path('lib_path', 'tests')
     >>> l_path_result = get_files_from_directory_recursive(test_dir)
     """
-    log_and_raise_if_not_isdir(path_base_dir)
+
     path_base_dir = path_base_dir.resolve()
-    l_path = list(path_base_dir.glob('**/*'))
-    l_path_result = [path for path in l_path if path.is_file()]
+    log_and_raise_if_not_isdir(path_base_dir)
+    l_path_result = list()
+
+    # we use os.walk because it is faster then pathlib.Path('.').rglob(*)
+    # and oddly pathlib.Path('.').rglob(*) fails on windows on samba share (sometimes)
+    for root, dirs, files in os.walk(str(path_base_dir), topdown=False):
+        for name in files:
+            path_file = pathlib.Path(root) / name
+            l_path_result.append(path_file)
+
     return l_path_result
+
+
+
+
 
 
 def log_and_raise_if_path_does_not_exist(path: pathlib.Path) -> None:
