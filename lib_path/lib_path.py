@@ -8,97 +8,12 @@ import logging
 import os
 import pathlib
 import subprocess
-from typing import List, Tuple, Union
+from typing import Union
 
 # INSTALLED
 import lib_platform
 
 logger = logging.getLogger()
-
-
-def expand_filelist_subdirectories(l_paths: List[pathlib.Path], expand_subdirs: bool = True) -> List[pathlib.Path]:
-    """
-    takes a mixed list of directories and files, and returns a list of files expanding the subdirectories
-    >>> # get test directory
-    >>> test_dir = get_test_directory_path('lib_path', 'tests')
-    >>> path_test_dir1 = test_dir / 'test_a/test_a_a'
-    >>> path_test_dir2 = test_dir / 'test_a/test_a_b'
-    >>> path_test_file1 = test_dir / 'test_a/file_test_a_1.txt'
-    >>> l_files = expand_filelist_subdirectories([path_test_dir1, path_test_dir2, path_test_dir2, path_test_file1])
-    >>> assert len(l_files) > 0
-
-    """
-
-    l_path_files, l_path_dirs = get_files_and_directories_from_list_of_paths(l_paths)
-    if expand_subdirs:
-        for path_dir in l_path_dirs:
-            l_directory_files = get_files_from_directory_recursive(path_dir)
-            l_path_files = l_path_files + l_directory_files
-    l_path_files = list(set(l_path_files))    # deduplicate
-    return l_path_files
-
-
-def get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) -> Tuple[List[pathlib.Path], List[pathlib.Path]]:
-    """
-    returns [files], [directories] absolute Paths
-
-    >>> # SETUP
-    >>> test_dir = get_test_directory_path('lib_path', 'tests') / 'test_a'
-    >>> l_paths = list(test_dir.glob('**/*'))
-    >>> l_paths_error = list(test_dir.glob('**/*'))
-    >>> l_paths_error.append(pathlib.Path('non_existing'))
-
-    >>> # TEST OK
-    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths)
-    >>> assert len(l_files) > 0
-    >>> assert len(l_dirs) > 0
-    >>> assert len(l_files) > len(l_dirs)
-
-    >>> # Test non Existing
-    >>> l_files, l_dirs = get_files_and_directories_from_list_of_paths(l_paths_error)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    Traceback (most recent call last):
-    ...
-    FileNotFoundError: path does not exist: ...non_existing
-
-    """
-
-    l_files = list()
-    l_dirs = list()
-
-    for path in l_paths:
-        path = path.resolve()
-        log_and_raise_if_path_does_not_exist(path)
-        if path.is_file():
-            l_files.append(path)
-        else:
-            l_dirs.append(path)
-    return l_files, l_dirs
-
-
-def get_files_from_directory_recursive(path_base_dir: pathlib.Path) -> List[pathlib.Path]:
-    """
-    get all files under the base directory, recursive. Includes also dotted Files and Directories
-    >>> # get test directory
-    >>> test_dir = get_test_directory_path('lib_path', 'tests')
-    >>> l_path_result = get_files_from_directory_recursive(test_dir)
-    """
-
-    path_base_dir = path_base_dir.resolve()
-    log_and_raise_if_not_isdir(path_base_dir)
-    l_path_result = list()
-
-    # we use os.walk because it is faster then pathlib.Path('.').rglob(*)
-    # and oddly pathlib.Path('.').rglob(*) fails on windows on samba share (sometimes)
-    for root, dirs, files in os.walk(str(path_base_dir), topdown=False):
-        for name in files:
-            path_file = pathlib.Path(root) / name
-            l_path_result.append(path_file)
-
-    return l_path_result
-
-
-
-
 
 
 def log_and_raise_if_path_does_not_exist(path: pathlib.Path) -> None:
@@ -439,6 +354,11 @@ def chdir_to_path_of_file(path_file: pathlib.Path) -> None:
         os.chdir(str(path_file_dir))
 
 
+def create_directory_if_not_exists(path_directory: pathlib.Path) -> None:
+    if not path_directory.is_dir():
+        path_directory.mkdir(parents=True)
+
+
 def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
     """
     if the first path is relative, on windows the drive will be the current drive.
@@ -558,6 +478,46 @@ def get_windows_system_drive_letter() -> str:
     return windows_drive
 
 
+def has_subdirs(path_dir: pathlib.Path) -> bool:
+
+    """
+    >>> # Setup
+    >>> path_test_dir = pathlib.Path(__file__).parent.parent / 'tests'
+    >>> path_dir_with_subdirs = path_test_dir / 'dir_with_subdirs'
+    >>> path_dir_without_subdirs = path_test_dir / 'dir_without_subdirs'
+
+    >>> # Test with subdirs
+    >>> assert has_subdirs(path_dir_with_subdirs)
+
+    >>> # Test without subdirs
+    >>> assert not has_subdirs(path_dir_without_subdirs)
+
+    """
+
+    if len(list(path_dir.glob('**/'))) > 1:
+        return True
+    else:
+        return False
+
+
+def is_directory_empty(path_directory: pathlib.Path) -> bool:
+    """
+    >>> # Setup
+    >>> path_test_dir = pathlib.Path(__file__).parent.parent / 'tests'
+    >>> __file__
+    >>> path_empty_dir = path_test_dir / 'empty_dir'
+
+    >>> # test Empty
+    >>> assert is_directory_empty(path_empty_dir)
+    >>> # test not empty
+    >>> assert not is_directory_empty(path_test_dir)
+
+    """
+    log_and_raise_if_not_isdir(path_directory)
+    is_empty = not any(path_directory.iterdir())
+    return is_empty
+
+
 def is_directory_writable(directory: str) -> bool:
     """
     stellt fest ob ein Verzeichnis beschreibbar ist
@@ -625,5 +585,5 @@ def make_test_directory_and_subdirs_fully_accessible_by_current_user(path_direct
     """
     if lib_platform.is_platform_linux:
         path_directory_name = str(path_directory_name)
-        proc_chown = subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
-        proc_chmod = subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
+        subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
+        subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
