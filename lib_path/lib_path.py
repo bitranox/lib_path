@@ -8,7 +8,7 @@ import logging
 import os
 import pathlib
 import subprocess
-from typing import Union
+from typing import List, Union
 
 # INSTALLED
 import lib_platform
@@ -463,6 +463,32 @@ def format_norm_path(path: str) -> str:
     return path
 
 
+def get_l_path_sub_directories(path_base_directory: pathlib.Path) -> List[pathlib.Path]:
+    """
+    gets the subdirectories of a path (non recursive)
+
+    >>> # Setup
+    >>> path_test_dir = pathlib.Path(__file__).parent.parent / 'tests'
+    >>> path_dir_with_subdirs = path_test_dir / 'dir_with_subdirs'
+    >>> path_dir_without_subdirs = path_test_dir / 'dir_without_subdirs'
+
+    >>> get_l_path_sub_directories(path_dir_with_subdirs)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    [...Path('subdir')]
+    >>> get_l_path_sub_directories(path_dir_without_subdirs)
+    []
+
+    """
+    log_and_raise_if_not_isdir(path_base_directory)
+    path_base_directory.resolve()
+
+    try:
+        l_sub_directories = next(os.walk(str(path_base_directory)))[1]
+        l_path_sub_directories = [pathlib.Path(str(subdir)) for subdir in l_sub_directories]
+        return l_path_sub_directories
+    except StopIteration:
+        return []
+
+
 def get_windows_system_drive_letter() -> str:
     """
     >>> if lib_platform.is_platform_windows:
@@ -494,7 +520,7 @@ def has_subdirs(path_dir: pathlib.Path) -> bool:
 
     """
 
-    if len(list(path_dir.glob('**/'))) > 1:
+    if len(get_l_path_sub_directories(path_dir)) > 0:
         return True
     else:
         return False
