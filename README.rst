@@ -118,8 +118,6 @@ Basic Usage
 
     format_abs_norm_path(path: str) -> str
 
-    get_absolute_dirname(path: str) -> str
-
     get_absolute_path(path: str) -> str
 
     get_absolute_path_relative_from_path(path: str, path2: str) -> str
@@ -131,8 +129,6 @@ Basic Usage
     get_files_and_directories_from_list_of_paths(l_paths: List[pathlib.Path]) -> Tuple[List[pathlib.Path], List[pathlib.Path]]
 
     get_files_from_directory_recursive(path_base_dir: pathlib.Path) -> List[pathlib.Path]
-
-    is_relative_path(path: str) -> bool
 
     is_windows_network_unc(path: str) -> bool
 

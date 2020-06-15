@@ -205,49 +205,6 @@ def strip_and_replace_backslashes(path: str) -> str:
     return path
 
 
-def is_relative_path(path: str) -> bool:
-    """
-    >>> is_relative_path('/test/test.txt')
-    False
-    >>> is_relative_path('//main/install')
-    False
-
-    >>> import platform
-    >>> is_windows = platform.system().lower() == 'windows'
-    >>> result = is_relative_path('c:/test/test.txt')
-    >>> if is_windows:
-    ...    assert result == False
-    ... else:
-    ...    assert result == True
-
-    >>> result = is_relative_path('D:/test/test.txt')
-    >>> if is_windows:
-    ...    assert result == False
-    ... else:
-    ...    assert result == True
-
-    >>> is_relative_path('.test/test.txt')
-    True
-    >>> is_relative_path('test/test.txt')
-    True
-    >>> is_relative_path('./test/test.txt')
-    True
-    >>> is_relative_path('....../test/test.txt')
-    True
-    >>> is_relative_path('../../../test/test.txt')
-    True
-
-    """
-    dirname = strip_and_replace_backslashes(os.path.dirname(path))  # windows : /test
-    abspath = strip_and_replace_backslashes(os.path.abspath(dirname))        # windows : C:/test
-    if not path_starts_with_windows_drive_letter(dirname):
-        abspath = substract_windows_drive_letter(abspath)
-    if dirname != abspath:
-        return True
-    else:
-        return False
-
-
 def get_current_dir() -> pathlib.Path:
     """
     >>> path = get_current_dir()
@@ -317,15 +274,20 @@ def get_absolute_path(path: str) -> str:
     return path
 
 
-def get_absolute_dirname(path: str) -> str:
+def get_absolute_dirname(path: pathlib.Path) -> pathlib.Path:
     """
-    >>> get_absolute_dirname('//main/test/../test2/lib_path.py')
+    >>> get_absolute_dirname(pathlib.Path('//main/test/../test2/lib_path.py'))
+
+
     '//main/test2'
+    """
     """
     absolute_filename = format_abs_norm_path(path)
     absolute_dirname = os.path.dirname(absolute_filename)
     absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
     absolute_dirname = path_remove_trailing_slashes(absolute_dirname)
+    """
+    absolute_dirname = path.resolve().parent
     return absolute_dirname
 
 
@@ -359,40 +321,47 @@ def create_directory_if_not_exists(path_directory: pathlib.Path) -> None:
         path_directory.mkdir(parents=True)
 
 
-def get_absolute_path_relative_from_path(path: str, path2: str) -> str:
+def get_absolute_path_relative_from_path(path_absolute_file: pathlib.Path, path_relative_to_dir_of_absolute_file: pathlib.Path) -> pathlib.Path:
     """
     if the first path is relative, on windows the drive will be the current drive.
     this is necessary because WINE gives drive "Z" back !
 
     >>> # path1 absolut, path2 relativ
-    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', './d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../a/b/c/d/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('./d/test.txt')))
+    >>> assert s_path.endswith('/a/b/c/d/test.txt')
+
     >>> # path1 relativ, path2 relativ
-    >>> get_absolute_path_relative_from_path('./a/b/c/some-file.txt', './d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../a/b/c/d/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some-file.txt'), pathlib.Path('./d/test.txt')))
+    >>> assert s_path.endswith('/a/b/c/d/test.txt')
+
     >>> # path1 absolut, path2 absolut
-    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', 'c:/d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../d/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('/d/test.txt')))
+    >>> assert s_path.endswith('/d/test.txt')
+
     >>> # path1 relativ, path2 absolut
-    >>> get_absolute_path_relative_from_path('./a/b/c/some-file.txt', 'c:/d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../d/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some-file.txt'), pathlib.Path('/d/test.txt')))
+    >>> assert s_path.endswith('/d/test.txt')
+
     >>> # path one level back
-    >>> get_absolute_path_relative_from_path('c:/a/b/c/some-file.txt', '../d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../a/b/d/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('../d/test.txt')))
+    >>> assert s_path.endswith('/a/b/d/test.txt')
+
     >>> # path two levels back
-    >>> get_absolute_path_relative_from_path('./a/b/c/some_file.txt', '../../d/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../a/d/test.txt'
-    >>> result = get_absolute_path_relative_from_path('./a/b/c/some_file.txt', '/f/test.txt')    # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    >>> result = substract_windows_drive_letter(result)
-    >>> assert result.lower() == '/f/test.txt'
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some_file.txt'),
+    ...                                                   pathlib.Path('../../d/test.txt')))
+    >>> assert s_path.endswith('/a/d/test.txt')
+
+    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some_file.txt'),
+    ...                                                   pathlib.Path('/f/test.txt')))
+    >>> assert s_path.endswith('/f/test.txt')
 
     """
 
-    if is_relative_path(path2):
-        base_path = get_absolute_dirname(path)
-        result_path = format_abs_norm_path(base_path + '/' + path2)
+    if path_relative_to_dir_of_absolute_file.is_absolute():
+        result_path = path_relative_to_dir_of_absolute_file.resolve()
     else:
-        result_path = format_abs_norm_path(path2)
+        base_path = path_absolute_file.resolve().parent
+        result_path = (base_path / path_relative_to_dir_of_absolute_file).resolve()
     return result_path
 
 
