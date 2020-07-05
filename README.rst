@@ -112,15 +112,11 @@ Basic Usage
 
 .. code-block:: sh
 
-    chdir_to_path_of_file(path: Pathlib.Path) -> None
-
     expand_filelist_subdirectories(l_paths: List[pathlib.Path], expand_subdirs: bool = True) -> List[pathlib.Path]
 
     format_abs_norm_path(path: str) -> str
 
     get_absolute_path(path: str) -> str
-
-    get_absolute_path_relative_from_path(path: str, path2: str) -> str
 
     get_basename_without_extension(path_file: pathlib.Path) -> str
 

@@ -295,74 +295,9 @@ def chdir(path: pathlib.Path):
     os.chdir(str(path))
 
 
-def chdir_to_path_of_file(path_file: pathlib.Path) -> None:
-    """
-    >>> # SETUP
-    >>> save_dir = get_current_dir()
-    >>> test_file = pathlib.Path(__file__).parent.parent / 'tests/test_a/file_test_a_1.txt'
-
-    >>> # Change Dir
-    >>> chdir_to_path_of_file(test_file)
-    >>> cur_dir = get_current_dir()
-    >>> assert str(cur_dir).endswith('/lib_path/tests/test_a')
-
-    >>> # Teardown
-    >>> os.chdir(str(save_dir))
-    """
-
-    if path_file:
-        path_file = path_file.resolve()
-        path_file_dir = path_file.parent
-        os.chdir(str(path_file_dir))
-
-
 def create_directory_if_not_exists(path_directory: pathlib.Path) -> None:
     if not path_directory.is_dir():
         path_directory.mkdir(parents=True)
-
-
-def get_absolute_path_relative_from_path(path_absolute_file: pathlib.Path, path_relative_to_dir_of_absolute_file: pathlib.Path) -> pathlib.Path:
-    """
-    if the first path is relative, on windows the drive will be the current drive.
-    this is necessary because WINE gives drive "Z" back !
-
-    >>> # path1 absolut, path2 relativ
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('./d/test.txt')))
-    >>> assert s_path.endswith('/a/b/c/d/test.txt')
-
-    >>> # path1 relativ, path2 relativ
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some-file.txt'), pathlib.Path('./d/test.txt')))
-    >>> assert s_path.endswith('/a/b/c/d/test.txt')
-
-    >>> # path1 absolut, path2 absolut
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('/d/test.txt')))
-    >>> assert s_path.endswith('/d/test.txt')
-
-    >>> # path1 relativ, path2 absolut
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some-file.txt'), pathlib.Path('/d/test.txt')))
-    >>> assert s_path.endswith('/d/test.txt')
-
-    >>> # path one level back
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('/a/b/c/some-file.txt'), pathlib.Path('../d/test.txt')))
-    >>> assert s_path.endswith('/a/b/d/test.txt')
-
-    >>> # path two levels back
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some_file.txt'),
-    ...                                                   pathlib.Path('../../d/test.txt')))
-    >>> assert s_path.endswith('/a/d/test.txt')
-
-    >>> s_path = str(get_absolute_path_relative_from_path(pathlib.Path('./a/b/c/some_file.txt'),
-    ...                                                   pathlib.Path('/f/test.txt')))
-    >>> assert s_path.endswith('/f/test.txt')
-
-    """
-
-    if path_relative_to_dir_of_absolute_file.is_absolute():
-        result_path = path_relative_to_dir_of_absolute_file.resolve()
-    else:
-        base_path = path_absolute_file.resolve().parent
-        result_path = (base_path / path_relative_to_dir_of_absolute_file).resolve()
-    return result_path
 
 
 def format_abs_norm_path(path: str) -> str:
