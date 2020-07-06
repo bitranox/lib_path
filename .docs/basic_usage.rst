@@ -2,10 +2,6 @@
 
     expand_filelist_subdirectories(l_paths: List[pathlib.Path], expand_subdirs: bool = True) -> List[pathlib.Path]
 
-    format_abs_norm_path(path: str) -> str
-
-    get_absolute_path(path: str) -> str
-
     get_basename_without_extension(path_file: pathlib.Path) -> str
 
     get_current_dir() -> pathlib.Path

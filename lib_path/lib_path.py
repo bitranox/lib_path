@@ -265,15 +265,6 @@ def path_starts_with_windows_drive_letter(path: str) -> bool:
         return False
 
 
-def get_absolute_path(path: str) -> str:
-    """
-    >>> get_absolute_path('./test.py')  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../test.py'
-    """
-    path = format_abs_norm_path(path)
-    return path
-
-
 def chdir(path: pathlib.Path):
     os.chdir(str(path))
 
@@ -281,73 +272,6 @@ def chdir(path: pathlib.Path):
 def create_directory_if_not_exists(path_directory: pathlib.Path) -> None:
     if not path_directory.is_dir():
         path_directory.mkdir(parents=True)
-
-
-def format_abs_norm_path(path: str) -> str:
-    """
-    >>> format_abs_norm_path(r'\\\\main')
-    '//main'
-    >>> # get test file
-    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
-    >>> result = format_abs_norm_path(test_file)
-    >>> assert result.endswith('/tests/test_a/file_test_a_1.txt')
-    >>> format_abs_norm_path('//main/test')
-    '//main/test'
-    >>> format_abs_norm_path('//main/test/../test2')
-    '//main/test2'
-    >>> format_abs_norm_path('main/test/../test2')     # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-    '.../main/test2'
-    >>> format_abs_norm_path('//main')
-    '//main'
-    >>> format_norm_path('c:/test/../test2/test.txt')
-    'c:/test2/test.txt'
-
-    """
-
-    path = strip_and_replace_backslashes(path)
-
-    if lib_platform.is_platform_windows and is_windows_network_unc(path):   # type: ignore
-        path = '/' + path.lstrip('/')
-        path = os.path.normpath(path)
-        path = os.path.abspath(path)
-        path = '/' + substract_windows_drive_letter(path)
-    else:
-        path = os.path.normpath(path)
-        path = os.path.abspath(path)
-    path = strip_and_replace_backslashes(path)
-    return path
-
-
-def format_norm_path(path: str) -> str:
-    """
-    >>> format_norm_path(r'\\\\main')
-    '//main'
-    >>> # get test file
-    >>> test_file = strip_and_replace_backslashes(str(__file__)).rsplit('/lib_path/', 1)[0] + '/tests/test_a/file_test_a_1.txt'
-    >>> result = format_abs_norm_path(test_file)
-    >>> assert result.endswith('/tests/test_a/file_test_a_1.txt')
-    >>> format_norm_path('//main/test')
-    '//main/test'
-    >>> format_norm_path('//main/test/../test2')
-    '//main/test2'
-    >>> format_norm_path('main/test/../test2')
-    'main/test2'
-    >>> format_norm_path('//main')
-    '//main'
-    >>> format_norm_path('c:/test/../test2/test.txt')
-    'c:/test2/test.txt'
-
-    """
-    path = strip_and_replace_backslashes(path)
-
-    if lib_platform.is_platform_windows and is_windows_network_unc(path):    # type: ignore
-        path = '/' + path.lstrip('/')
-        path = os.path.normpath(path)
-        path = '/' + substract_windows_drive_letter(path)
-    else:
-        path = os.path.normpath(path)
-    path = strip_and_replace_backslashes(path)
-    return path
 
 
 def get_l_path_sub_directories(path_base_directory: pathlib.Path) -> List[pathlib.Path]:
