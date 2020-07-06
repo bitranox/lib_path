@@ -341,7 +341,6 @@ def is_directory_empty(path_directory: pathlib.Path) -> bool:
     """
     >>> # Setup
     >>> path_test_dir = pathlib.Path(__file__).parent.parent / 'tests'
-    >>> __file__
     >>> path_empty_dir = path_test_dir / 'empty_dir'
 
     >>> # test Empty
