@@ -274,23 +274,6 @@ def get_absolute_path(path: str) -> str:
     return path
 
 
-def get_absolute_dirname(path: pathlib.Path) -> pathlib.Path:
-    """
-    >>> get_absolute_dirname(pathlib.Path('//main/test/../test2/lib_path.py'))
-
-
-    '//main/test2'
-    """
-    """
-    absolute_filename = format_abs_norm_path(path)
-    absolute_dirname = os.path.dirname(absolute_filename)
-    absolute_dirname = strip_and_replace_backslashes(absolute_dirname)
-    absolute_dirname = path_remove_trailing_slashes(absolute_dirname)
-    """
-    absolute_dirname = path.resolve().parent
-    return absolute_dirname
-
-
 def chdir(path: pathlib.Path):
     os.chdir(str(path))
 
