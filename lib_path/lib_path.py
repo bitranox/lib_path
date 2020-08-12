@@ -269,11 +269,6 @@ def chdir(path: pathlib.Path):
     os.chdir(str(path))
 
 
-def create_directory_if_not_exists(path_directory: pathlib.Path) -> None:
-    if not path_directory.is_dir():
-        path_directory.mkdir(parents=True)
-
-
 def get_l_path_sub_directories(path_base_directory: pathlib.Path) -> List[pathlib.Path]:
     """
     gets the subdirectories of a path (non recursive)
