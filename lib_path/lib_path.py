@@ -76,14 +76,16 @@ def log_and_raise_if_target_directory_within_source_directory(path_source_dir: p
     >>> path_target_dir_ok=pathlib.Path('./test2/test')
     >>> path_target_dir_err=pathlib.Path('./test/test2')
 
-    >>> # Test OK
-    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_ok)
-
     >>> # Test ERR
     >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_err)
     Traceback (most recent call last):
     ...
     FileExistsError: target directory: "..." is within the source directory "..."
+
+
+    >>> # Test OK
+    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_ok)
+
 
     """
     if is_target_directory_within_source_directory(path_source_dir, path_target_dir):
@@ -95,6 +97,7 @@ def log_and_raise_if_target_directory_within_source_directory(path_source_dir: p
 def is_target_directory_within_source_directory(path_source_dir: pathlib.Path, path_target_dir: pathlib.Path) -> bool:
     s_source_dir = str(path_source_dir.resolve()) + '/'
     s_target_dir = str(path_target_dir.resolve()) + '/'
+    logger.error('S:' + s_source_dir + ' T:' + s_target_dir)
     if s_target_dir.startswith(s_source_dir):
         return True
     else:
