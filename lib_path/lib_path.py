@@ -28,7 +28,7 @@ def log_and_raise_if_path_does_not_exist(path: pathlib.Path) -> None:
     >>> log_and_raise_if_path_does_not_exist(test_existing_file)
 
     >>> # Test Raise
-    >>> log_and_raise_if_path_does_not_exist(test_non_existing)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_path_does_not_exist(test_non_existing)
     Traceback (most recent call last):
     ...
     FileNotFoundError: path does not exist: does_not_exist
@@ -50,13 +50,13 @@ def log_and_raise_if_not_isdir(path_dir: pathlib.Path) -> None:
     >>> log_and_raise_if_not_isdir(test_dir_exist)
 
     >>> # TEST non existent
-    >>> log_and_raise_if_not_isdir(test_dir_not_exist)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_not_isdir(test_dir_not_exist)
     Traceback (most recent call last):
     ...
     NotADirectoryError: not a directory : does_not_exist
 
     >>> # TEST is file
-    >>> log_and_raise_if_not_isdir(test_dir_not_exist)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_not_isdir(test_dir_not_exist)
     Traceback (most recent call last):
     ...
     NotADirectoryError: not a directory : does_not_exist
@@ -72,18 +72,18 @@ def log_and_raise_if_not_isdir(path_dir: pathlib.Path) -> None:
 def log_and_raise_if_target_directory_within_source_directory(path_source_dir: pathlib.Path, path_target_dir: pathlib.Path) -> None:
     """
     >>> # Setup
-    >>> path_source_dir=pathlib.Path('/test')
-    >>> path_target_dir_ok=pathlib.Path('/test2/test')
-    >>> path_target_dir_err=pathlib.Path('/test/test2')
+    >>> path_source_dir=pathlib.Path('./test')
+    >>> path_target_dir_ok=pathlib.Path('./test2/test')
+    >>> path_target_dir_err=pathlib.Path('./test/test2')
 
     >>> # Test OK
     >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_ok)
 
     >>> # Test ERR
-    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_err)   # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_target_directory_within_source_directory(path_source_dir, path_target_dir_err)
     Traceback (most recent call last):
     ...
-    FileExistsError: target directory: "/test/test2" is within the source directory "/test"
+    FileExistsError: target directory: "..." is within the source directory "..."
 
     """
     if is_target_directory_within_source_directory(path_source_dir, path_target_dir):
@@ -111,7 +111,7 @@ def log_and_raise_if_not_isfile(path_file: pathlib.Path) -> None:
     >>> log_and_raise_if_not_isfile(path_file_ok)
 
     >>> # TEST ERR
-    >>> log_and_raise_if_not_isfile(path_file_err)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> log_and_raise_if_not_isfile(path_file_err)
     Traceback (most recent call last):
     ...
     FileNotFoundError: file does not exist or no permission: does_not_exist
@@ -278,7 +278,7 @@ def get_l_path_sub_directories(path_base_directory: pathlib.Path) -> List[pathli
     >>> path_dir_with_subdirs = path_test_dir / 'dir_with_subdirs'
     >>> path_dir_without_subdirs = path_test_dir / 'dir_without_subdirs'
 
-    >>> get_l_path_sub_directories(path_dir_with_subdirs)  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> get_l_path_sub_directories(path_dir_with_subdirs)
     [...Path('subdir')]
     >>> get_l_path_sub_directories(path_dir_without_subdirs)
     []
