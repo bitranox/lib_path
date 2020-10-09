@@ -2,7 +2,7 @@ lib_path
 ========
 
 
-Version v1.0.2 as of 2020-10-09 see `Changelog`_
+Version v1.0.3a0 as of 2020-10-09 see `Changelog`_
 
 
 .. include:: ./badges.rst
