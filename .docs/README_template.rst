@@ -1,45 +1,45 @@
 lib_path
 ========
 
-.. include:: ./badges_project.rst
 
-path related functions - that also work correctly with windows UNC Paths like //server/share/directory/../../directory2
+Version v1.0.2 as of 2020-10-09 see `Changelog`_
+
+
+.. include:: ./badges.rst
+
+.. include:: ./description.rst
+
+----
+
+automated tests, Travis Matrix, Documentation, Badges, etc. are managed with `PizzaCutter <https://github
+.com/bitranox/PizzaCutter>`_ (cookiecutter on steroids)
+
+Python version required: 3.6.0 or newer
 
 .. include:: ./tested_under.rst
 
 ----
 
-- `Try it Online`_
-- `Installation and Upgrade`_
-- `Basic Usage`_
-- `Requirements`_
-- `Acknowledgements`_
-- `Contribute`_
-- `Report Issues <https://github.com/bitranox/lib_platform/blob/master/ISSUE_TEMPLATE.md>`_
-- `Pull Request <https://github.com/bitranox/lib_platform/blob/master/PULL_REQUEST_TEMPLATE.md>`_
-- `Code of Conduct <https://github.com/bitranox/lib_platform/blob/master/CODE_OF_CONDUCT.md>`_
-- `License`_
-- `Changelog`_
+.. include:: ./index.rst
 
 ----
 
-Try it Online
--------------
 .. include:: ./try_in_jupyter.rst
 
+Usage
+-----------
+.. include:: ./usage.rst
+
+Usage from Commandline
+------------------------
+.. include:: ./commandline_help.rst
 
 Installation and Upgrade
 ------------------------
 .. include:: ./installation.rst
 
-
-Basic Usage
------------
-.. include:: ./basic_usage.rst
-
 Requirements
 ------------
-
 following modules will be automatically installed :
 
 .. include:: ../requirements.txt
@@ -57,6 +57,6 @@ License
 -------
 .. include:: ./licence_mit.rst
 
-----
+---
 
 .. include:: ../CHANGES.rst

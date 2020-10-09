@@ -265,7 +265,7 @@ def path_starts_with_windows_drive_letter(path: str) -> bool:
         return False
 
 
-def chdir(path: pathlib.Path):
+def chdir(path: pathlib.Path) -> None:
     os.chdir(str(path))
 
 
@@ -418,3 +418,7 @@ def make_test_directory_and_subdirs_fully_accessible_by_current_user(path_direct
         path_directory_name = str(path_directory_name)
         subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
         subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
+
+
+if __name__ == '__main__':
+    print('this is a library only, the executable is named lib_path_cli.py')
