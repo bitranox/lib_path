@@ -26,9 +26,11 @@ classifiers = [
 # dependencies - former setup.cfg "install_requires"
 # see: https://setuptools.pypa.io/en/latest/userguide/dependency_management.html
 dependencies = [
+    "cli_exit_tools",
+    "lib_detect_testenv",
     "lib_platform",
 ]
-version = "v1.0.3"
+version = "v1.0.4"
 # seems to be not allowed anymore
 # zip-save = false
 
@@ -40,16 +42,16 @@ Changelog = "https://github.com/bitranox/lib_path/blob/master/CHANGES.rst"
 
 [project.optional-dependencies]
 test = [
+    "coverage",
+    "pytest-cov",
     "readme_renderer",
+    "codecov",
+    "pytest",
     "mypy",
     "pytest-runner",
+    "coloredlogs",
     "black",
     "flake8",
-    "coloredlogs",
-    "coverage",
-    "pytest",
-    "pytest-cov",
-    "codecov",
 ]
 
 [project.scripts]

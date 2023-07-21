@@ -2,7 +2,7 @@ lib_path
 ========
 
 
-Version v1.0.3 as of 2023-07-21 see `Changelog`_
+Version v1.0.4 as of 2023-07-21 see `Changelog`_
 
 |build_badge| |codeql| |license| |jupyter| |pypi|
 |pypi-downloads| |black| |codecov| |cc_maintain| |cc_issues| |cc_coverage| |snyk|
@@ -224,6 +224,8 @@ following modules will be automatically installed :
 .. code-block:: bash
 
     ## Project Requirements
+    cli_exit_tools
+    lib_detect_testenv
     lib_platform
 
 Acknowledgements
@@ -246,6 +248,11 @@ This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/M
 
 Changelog
 =========
+
+v1.0.4
+--------
+2023-07-21:
+    - update requirements
 
 v1.0.3
 --------
