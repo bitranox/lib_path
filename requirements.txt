@@ -1,2 +1,2 @@
 ## Project Requirements
-lib_platform @ git+https://github.com/bitranox/lib_platform.git
+lib_platform

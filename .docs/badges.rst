@@ -1,16 +1,20 @@
-|travis_build| |license| |jupyter| |pypi| 
+|build_badge| |codeql| |license| |jupyter| |pypi| 
+|pypi-downloads| |black| |codecov| |cc_maintain| |cc_issues| |cc_coverage| |snyk|
 
-|codecov| |better_code| |cc_maintain| |cc_issues| |cc_coverage| |snyk|
 
 
-.. |travis_build| image:: https://img.shields.io/travis/bitranox/lib_path/master.svg
-   :target: https://travis-ci.org/bitranox/lib_path
+.. |build_badge| image:: https://github.com/bitranox/lib_path/actions/workflows/python-package.yml/badge.svg
+   :target: https://github.com/bitranox/lib_path/actions/workflows/python-package.yml
+
+
+.. |codeql| image:: https://github.com/bitranox/lib_path/actions/workflows/codeql-analysis.yml/badge.svg?event=push
+   :target: https://github.com//bitranox/lib_path/actions/workflows/codeql-analysis.yml
 
 .. |license| image:: https://img.shields.io/github/license/webcomics/pywine.svg
    :target: http://en.wikipedia.org/wiki/MIT_License
 
 .. |jupyter| image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/bitranox/lib_path/master?filepath=lib_path.ipynb
+   :target: https://mybinder.org/v2/gh/bitranox/lib_path/master?filepath=lib_path.ipynb
 
 .. for the pypi status link note the dashes, not the underscore !
 .. |pypi| image:: https://img.shields.io/pypi/status/lib-path?label=PyPI%20Package
@@ -18,9 +22,6 @@
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/bitranox/lib_path
    :target: https://codecov.io/gh/bitranox/lib_path
-
-.. |better_code| image:: https://bettercodehub.com/edge/badge/bitranox/lib_path?branch=master
-   :target: https://bettercodehub.com/results/bitranox/lib_path
 
 .. |cc_maintain| image:: https://img.shields.io/codeclimate/maintainability-percentage/bitranox/lib_path?label=CC%20maintainability
    :target: https://codeclimate.com/github/bitranox/lib_path/maintainability
@@ -34,8 +35,12 @@
    :target: https://codeclimate.com/github/bitranox/lib_path/test_coverage
    :alt: Code Coverage
 
-.. |snyk| image:: https://img.shields.io/snyk/vulnerabilities/github/bitranox/lib_path
+.. |snyk| image:: https://snyk.io/test/github/bitranox/lib_path/badge.svg
    :target: https://snyk.io/test/github/bitranox/lib_path
 
 .. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
+
+.. |pypi-downloads| image:: https://img.shields.io/pypi/dm/lib-path
+   :target: https://pypi.org/project/lib-path/
+   :alt: PyPI - Downloads

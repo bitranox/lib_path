@@ -34,7 +34,7 @@ def log_and_raise_if_path_does_not_exist(path: pathlib.Path) -> None:
     FileNotFoundError: path does not exist: does_not_exist
     """
     if not path.exists():
-        s_error = 'path does not exist: {path}'.format(path=path)
+        s_error = f'path does not exist: {path}'
         logger.error(s_error)
         raise FileNotFoundError(s_error)
 
@@ -64,7 +64,7 @@ def log_and_raise_if_not_isdir(path_dir: pathlib.Path) -> None:
     """
 
     if not path_dir.is_dir():
-        s_error = 'not a directory : {path_dir}'.format(path_dir=path_dir)
+        s_error = f'not a directory : {path_dir}'
         logger.error(s_error)
         raise NotADirectoryError(s_error)
 
@@ -87,7 +87,7 @@ def log_and_raise_if_target_directory_within_source_directory(path_source_dir: p
 
     """
     if is_target_directory_within_source_directory(path_source_dir, path_target_dir):
-        s_error = 'target directory: "{}" is within the source directory "{}"'.format(path_target_dir, path_source_dir)
+        s_error = f'target directory: "{path_target_dir}" is within the source directory "{path_source_dir}"'
         logger.error(s_error)
         raise FileExistsError(s_error)
 
@@ -117,7 +117,7 @@ def log_and_raise_if_not_isfile(path_file: pathlib.Path) -> None:
     FileNotFoundError: file does not exist or no permission: does_not_exist
     """
     if not path_file.is_file():
-        s_error = 'file does not exist or no permission: {path_file}'.format(path_file=path_file)
+        s_error = f'file does not exist or no permission: {path_file}'
         logger.error(s_error)
         raise FileNotFoundError(s_error)
 
@@ -401,7 +401,7 @@ def get_test_directory_path(module_name: str, test_directory_name: str = 'tests'
         if (path_origin_resolved_directory / test_directory_name).is_dir():
             break
         if path_origin_resolved_directory == root_directory:
-            raise FileNotFoundError('test directory "{test_directory_name}" not found'.format(test_directory_name=test_directory_name))
+            raise FileNotFoundError(f'test directory "{test_directory_name}" not found')
         path_origin_resolved_directory = path_origin_resolved_directory.parent
     path_to_test_directory = path_origin_resolved_directory / test_directory_name
     return path_to_test_directory
