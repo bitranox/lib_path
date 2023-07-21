@@ -42,16 +42,16 @@ Changelog = "https://github.com/bitranox/lib_path/blob/master/CHANGES.rst"
 
 [project.optional-dependencies]
 test = [
-    "coverage",
-    "pytest-cov",
-    "readme_renderer",
-    "codecov",
-    "pytest",
-    "mypy",
-    "pytest-runner",
-    "coloredlogs",
     "black",
+    "codecov",
+    "coloredlogs",
+    "coverage",
     "flake8",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "pytest-runner",
+    "readme_renderer",
 ]
 
 [project.scripts]
@@ -59,9 +59,9 @@ test = [
 
 [tool.setuptools.package-data]
 lib_path = [
-    "py.typed",
     "*.pyi",
     "__init__.pyi",
+    "py.typed",
 ]
 
 [tool.black]
