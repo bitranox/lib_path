@@ -297,7 +297,7 @@ def get_l_path_sub_directories(path_base_directory: pathlib.Path) -> List[pathli
 
 def get_windows_system_drive_letter() -> str:
     """
-    >>> if lib_platform.is_platform_windows:
+    >>> if lib_platform.get_is_platform_windows():
     ...   drive = get_windows_system_drive_letter()
     ...   assert drive == 'c:'
 
@@ -355,7 +355,7 @@ def is_directory_writable(directory: str) -> bool:
     """
     stellt fest ob ein Verzeichnis beschreibbar ist
 
-    >>> if lib_platform.is_platform_windows:
+    >>> if lib_platform.get_is_platform_windows():
     ...     drive_letter = get_windows_system_drive_letter()
     ...     temp_dir = drive_letter + '/user/public/temp'
     ...     os.makedirs(temp_dir, exist_ok=True)
@@ -416,7 +416,7 @@ def make_test_directory_and_subdirs_fully_accessible_by_current_user(path_direct
 
 
     """
-    if lib_platform.is_platform_linux:
+    if lib_platform.get_is_platform_linux():
         path_directory_name = str(path_directory_name)
         subprocess.run(['sudo', 'chown', '-R', getpass.getuser() + '.' + getpass.getuser(), path_directory_name], check=True)
         subprocess.run(['sudo', 'chmod', '-R', '777', path_directory_name], check=True)
